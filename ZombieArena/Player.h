@@ -76,22 +76,13 @@ public:
 	int getHealth();
 
 	// The next four functions move the player
-	void moveLeft();
+	void moveLeft( bool aMove );
 
-	void moveRight();
+	void moveRight( bool aMove );
 
-	void moveUp();
+	void moveUp( bool aMove );
 
-	void moveDown();
-
-	// Stop the player moving in a specific direction
-	void stopLeft();
-
-	void stopRight();
-
-	void stopUp();
-
-	void stopDown();
+	void moveDown( bool aMove );
 
 	// We will call this function once every frame
 	void update(float elapsedTime, Vector2i mousePosition);

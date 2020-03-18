@@ -78,44 +78,24 @@ int Player::getHealth()
 	return m_Health;
 }
 
-void Player::moveLeft()
+void Player::moveLeft(bool aMove)
 {
-	m_LeftPressed = true;
+	m_LeftPressed = aMove;
 }
 
-void Player::moveRight()
+void Player::moveRight(bool aMove)
 {
-	m_RightPressed = true;
+	m_RightPressed = aMove;
 }
 
-void Player::moveUp()
+void Player::moveUp(bool aMove)
 {
-	m_UpPressed = true;
+	m_UpPressed = aMove;
 }
 
-void Player::moveDown()
+void Player::moveDown(bool aMove)
 {
-	m_DownPressed = true;
-}
-
-void Player::stopLeft()
-{
-	m_LeftPressed = false;
-}
-
-void Player::stopRight()
-{
-	m_RightPressed = false;
-}
-
-void Player::stopUp()
-{
-	m_UpPressed = false;
-}
-
-void Player::stopDown()
-{
-	m_DownPressed = false;
+	m_DownPressed = aMove;
 }
 
 void Player::update(float elapsedTime, Vector2i mousePosition)

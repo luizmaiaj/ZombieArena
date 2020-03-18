@@ -4,6 +4,7 @@
 #include <iostream>
 
 #include "Player.h"
+#include "ZombieArena.h"
 
 int main()
 {
@@ -39,6 +40,12 @@ int main()
 
 	// The boundaries of the arena
 	IntRect arena;
+
+	// Create the background
+	VertexArray background;
+	// Load the texture for our background vertex array
+	Texture textureBackground;
+	textureBackground.loadFromFile("graphics/background_sheet.png");
 
 	// The main game loop
 	while (window.isOpen())
@@ -96,41 +103,11 @@ int main()
 		if (state == State::PLAYING)
 		{
 			// Handle the pressing and releasing of the WASD keys
-			if (Keyboard::isKeyPressed(Keyboard::W))
-			{
-				player.moveUp();
-			}
-			else
-			{
-				player.stopUp();
-			}
 
-			if (Keyboard::isKeyPressed(Keyboard::S))
-			{
-				player.moveDown();
-			}
-			else
-			{
-				player.stopDown();
-			}
-
-			if (Keyboard::isKeyPressed(Keyboard::A))
-			{
-				player.moveLeft();
-			}
-			else
-			{
-				player.stopLeft();
-			}
-
-			if (Keyboard::isKeyPressed(Keyboard::D))
-			{
-				player.moveRight();
-			}
-			else
-			{
-				player.stopRight();
-			}
+			player.moveUp((Keyboard::isKeyPressed(Keyboard::Z))? true : false);
+			player.moveDown((Keyboard::isKeyPressed(Keyboard::S)) ? true : false);
+			player.moveLeft((Keyboard::isKeyPressed(Keyboard::Q)) ? true : false);
+			player.moveRight((Keyboard::isKeyPressed(Keyboard::D)) ? true : false);
 
 		}// End WASD while playing
 
@@ -177,8 +154,9 @@ int main()
 				arena.left = 0;
 				arena.top = 0;
 
-				// We will modify this line of code later
-				int tileSize = 50;
+				// Pass the vertex array by reference 
+				// to the createBackground function
+				int tileSize = createBackground(background, arena);
 
 				// Spawn the player in the middle of the arena
 				player.spawn(arena, resolution, tileSize);
@@ -232,6 +210,9 @@ int main()
 			// And draw everything related to it
 			window.setView(mainView);
 
+			// Draw the background
+			window.draw(background, &textureBackground);
+
 			// Draw the player
 			window.draw(player.getSprite());
 		}
@@ -255,3 +236,65 @@ int main()
 	return 0;
 }
 
+int createBackground(VertexArray& rVA, IntRect arena)
+{
+	// Anything we do to rVA we are actually doing to background (in the main function)
+
+	// How big is each tile/texture
+	const int TILE_SIZE = 50;
+	const int TILE_TYPES = 3;
+	const int VERTS_IN_QUAD = 4;
+
+	int worldWidth = arena.width / TILE_SIZE;
+	int worldHeight = arena.height / TILE_SIZE;
+
+	// What type of primitive are we using?
+	rVA.setPrimitiveType(Quads);
+
+	// Set the size of the vertex array
+	rVA.resize(worldWidth * worldHeight * VERTS_IN_QUAD);
+
+	// Start at the beginning of the vertex array
+	int currentVertex = 0;
+
+	for (int w = 0; w < worldWidth; w++)
+	{
+		for (int h = 0; h < worldHeight; h++)
+		{
+			// Position each vertex in the current quad
+			rVA[currentVertex + 0].position = Vector2f((float) w * TILE_SIZE, (float) h * TILE_SIZE);
+			rVA[currentVertex + 1].position = Vector2f((float) (w * TILE_SIZE) + TILE_SIZE, (float) h * TILE_SIZE);
+			rVA[currentVertex + 2].position = Vector2f((float) (w * TILE_SIZE) + TILE_SIZE, (float) (h * TILE_SIZE) + TILE_SIZE);
+			rVA[currentVertex + 3].position = Vector2f((float) (w * TILE_SIZE), (float) (h * TILE_SIZE) + TILE_SIZE);
+
+			// Define the position in the Texture to draw for current quad
+			// Either mud, stone, grass or wall
+			if (h == 0 || h == worldHeight - 1 || w == 0 || w == worldWidth - 1)
+			{
+				// Use the wall texture
+				rVA[currentVertex + 0].texCoords = Vector2f(0, 0 + TILE_TYPES * TILE_SIZE);
+				rVA[currentVertex + 1].texCoords = Vector2f(TILE_SIZE, 0 + TILE_TYPES * TILE_SIZE);
+				rVA[currentVertex + 2].texCoords = Vector2f(TILE_SIZE, TILE_SIZE + TILE_TYPES * TILE_SIZE);
+				rVA[currentVertex + 3].texCoords = Vector2f(0, TILE_SIZE + TILE_TYPES * TILE_SIZE);
+			}
+			else
+			{
+				// Use a random floor texture
+				srand((int)time(0) + h * w - h);
+				int mOrG = (rand() % TILE_TYPES);
+				int verticalOffset = mOrG * TILE_SIZE;
+
+				rVA[currentVertex + 0].texCoords = Vector2f((float) 0, (float) 0 + verticalOffset);
+				rVA[currentVertex + 1].texCoords = Vector2f((float) TILE_SIZE, (float) 0 + verticalOffset);
+				rVA[currentVertex + 2].texCoords = Vector2f((float) TILE_SIZE, (float) TILE_SIZE + verticalOffset);
+				rVA[currentVertex + 3].texCoords = Vector2f((float) 0, (float) TILE_SIZE + verticalOffset);
+
+			}
+
+			// Position ready for the next for vertices
+			currentVertex = currentVertex + VERTS_IN_QUAD;
+		}
+	}
+
+	return TILE_SIZE;
+}
