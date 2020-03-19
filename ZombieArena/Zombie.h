@@ -27,13 +27,13 @@ private:
 	Sprite m_Sprite;
 
 	// How fast can this one run/crawl?
-	float m_Speed;
+	float m_Speed{ 0.f };
 
 	// How much health has it got?
-	float m_Health;
+	float m_Health{ 0.f };
 
 	// Is it still alive?
-	bool m_Alive;
+	bool m_Alive{ true };
 
 	// Public prototypes go here	
 public:

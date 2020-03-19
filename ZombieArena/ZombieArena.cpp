@@ -5,10 +5,13 @@
 
 #include "Player.h"
 #include "ZombieArena.h"
+#include "TextureHolder.h"
 
 int main()
 {
     std::cout << "Hello World!\n";
+
+	TextureHolder holder;
 
 	// The game will always be in one of four states
 	enum class State { PAUSED, LEVELING_UP, GAME_OVER, PLAYING };
@@ -44,8 +47,12 @@ int main()
 	// Create the background
 	VertexArray background;
 	// Load the texture for our background vertex array
-	Texture textureBackground;
-	textureBackground.loadFromFile("graphics/background_sheet.png");
+	Texture textureBackground = TextureHolder::GetTexture("graphics/background_sheet.png");
+
+	// Prepare for a horde of zombies
+	int numZombies;
+	int numZombiesAlive;
+	Zombie* zombies = NULL;
 
 	// The main game loop
 	while (window.isOpen())
@@ -161,6 +168,14 @@ int main()
 				// Spawn the player in the middle of the arena
 				player.spawn(arena, resolution, tileSize);
 
+				// Create a horde of zombies
+				numZombies = 10;
+
+				// Delete the previously allocated memory (if it exists)
+				delete[] zombies;
+				zombies = createHorde(numZombies, arena);
+				numZombiesAlive = numZombies;
+
 				// Reset the clock so there isn't a frame jump
 				clock.restart();
 			}
@@ -194,6 +209,15 @@ int main()
 
 			// Make the view centre around the player				
 			mainView.setCenter(player.getCenter());
+
+			// Loop through each Zombie and update them
+			for (int i = 0; i < numZombies; i++)
+			{
+				if (zombies[i].isAlive())
+				{
+					zombies[i].update(dt.asSeconds(), playerPosition);
+				}
+			}
 		}// End updating the scene
 
 		/*
@@ -212,6 +236,12 @@ int main()
 
 			// Draw the background
 			window.draw(background, &textureBackground);
+
+			// Draw the zombies
+			for (int i = 0; i < numZombies; i++)
+			{
+				window.draw(zombies[i].getSprite());
+			}
 
 			// Draw the player
 			window.draw(player.getSprite());
@@ -297,4 +327,59 @@ int createBackground(VertexArray& rVA, IntRect arena)
 	}
 
 	return TILE_SIZE;
+}
+
+Zombie* createHorde(int numZombies, IntRect arena)
+{
+	Zombie* zombies = new Zombie[numZombies];
+
+	int maxY = arena.height - 20;
+	int minY = arena.top + 20;
+	int maxX = arena.width - 20;
+	int minX = arena.left + 20;
+
+	for (int i = 0; i < numZombies; i++)
+	{
+
+		// Which side should the zombie spawn
+		srand((int)time(0) * i);
+		int side = (rand() % 4);
+		float x = 0.f, y = 0.f;
+
+		switch (side)
+		{
+		case 0:
+			// left
+			x = (float) minX;
+			y = (float) (rand() % maxY) + minY;
+			break;
+
+		case 1:
+			// right
+			x = (float) maxX;
+			y = (float) (rand() % maxY) + minY;
+			break;
+
+		case 2:
+			// top
+			x = (float) (rand() % maxX) + minX;
+			y = (float) minY;
+			break;
+
+		case 3:
+			// bottom
+			x = (float) (rand() % maxX) + minX;
+			y = (float) maxY;
+			break;
+		}
+
+		// Bloater, crawler or runner
+		srand((int)time(0) * i * 2);
+		int type = (rand() % 3);
+
+		// Spawn the new zombie into the array
+		zombies[i].spawn(x, y, type, i);
+
+	}
+	return zombies;
 }

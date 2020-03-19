@@ -5,7 +5,6 @@
 
 using namespace std;
 
-
 void Zombie::spawn(float startX, float startY, int type, int seed)
 {
 
@@ -60,8 +59,7 @@ bool Zombie::hit()
 	{
 		// dead
 		m_Alive = false;
-		m_Sprite.setTexture(TextureHolder::GetTexture(
-			"graphics/blood.png"));
+		m_Sprite.setTexture(TextureHolder::GetTexture("graphics/blood.png"));
 
 		return true;
 	}
@@ -95,26 +93,22 @@ void Zombie::update(float elapsedTime,
 	// Update the zombie position variables
 	if (playerX > m_Position.x)
 	{
-		m_Position.x = m_Position.x +
-			m_Speed * elapsedTime;
+		m_Position.x = m_Position.x + m_Speed * elapsedTime;
 	}
 
 	if (playerY > m_Position.y)
 	{
-		m_Position.y = m_Position.y +
-			m_Speed * elapsedTime;
+		m_Position.y = m_Position.y + m_Speed * elapsedTime;
 	}
 
 	if (playerX < m_Position.x)
 	{
-		m_Position.x = m_Position.x -
-			m_Speed * elapsedTime;
+		m_Position.x = m_Position.x - m_Speed * elapsedTime;
 	}
 
 	if (playerY < m_Position.y)
 	{
-		m_Position.y = m_Position.y -
-			m_Speed * elapsedTime;
+		m_Position.y = m_Position.y - m_Speed * elapsedTime;
 	}
 
 	// Move the sprite
