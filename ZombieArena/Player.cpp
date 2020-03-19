@@ -1,14 +1,27 @@
 #include "Player.h"
+#include "TextureHolder.h"
 
 Player::Player()
 {
+	m_Speed = START_SPEED;
+	m_Health = START_HEALTH;
+	m_MaxHealth = START_HEALTH;
+
 	// Associate a texture with the sprite
 	// !!Watch this space!!
-	m_Sprite = Sprite(TextureHolder::GetTexture("graphics/player.png"));
+	m_Sprite = Sprite(TextureHolder::GetTexture(
+		"graphics/player.png"));
 
 	// Set the origin of the sprite to the centre, 
 	// for smooth rotation
 	m_Sprite.setOrigin(25, 25);
+}
+
+void Player::resetPlayerStats()
+{
+	m_Speed = START_SPEED;
+	m_Health = START_HEALTH;
+	m_MaxHealth = START_HEALTH;
 }
 
 void Player::spawn(IntRect arena, Vector2f resolution, int tileSize)
@@ -146,7 +159,7 @@ void Player::update(float elapsedTime, Vector2i mousePosition)
 	}
 
 	// Calculate the angle the player is facing
-	float angle = (float) ((atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * 180) / 3.141);
+	float angle = (atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * 180.f) / 3.141f;
 
 	m_Sprite.setRotation(angle);
 }
