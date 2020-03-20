@@ -98,48 +98,13 @@ int main()
 	spriteAmmoIcon.setPosition(20, 980);
 
 	// Load the font
-	Font font;
-	font.loadFromFile("fonts/zombiecontrol.ttf");
+	string strFontFile = "fonts/zombiecontrol.ttf";
 
-	// Paused
-	Text pausedText;
-	pausedText.setFont(font);
-	pausedText.setCharacterSize(155);
-	pausedText.setFillColor(Color::White);
-	pausedText.setPosition(400, 400);
-	pausedText.setString("Press Enter \nto continue");
-
-	// Game Over
-	Text gameOverText;
-	gameOverText.setFont(font);
-	gameOverText.setCharacterSize(125);
-	gameOverText.setFillColor(Color::White);
-	gameOverText.setPosition(250, 650);
-	gameOverText.setString("Play <ENTER>\nEsc <exit>");
-
-	// Levelling up
-	Text levelUpText;
-	levelUpText.setFont(font);
-	levelUpText.setCharacterSize(80);
-	levelUpText.setFillColor(Color::White);
-	levelUpText.setPosition(150, 250);
-	std::stringstream levelUpStream;
-	levelUpStream << "1- Increased rate of fire\n2- Increased clip size\n3- Increased max health\n4- Increased run speed\n5- More and better health pickups\n6- More and better ammo pickups";
-	levelUpText.setString(levelUpStream.str());
-
-	// Ammo
-	Text ammoText;
-	ammoText.setFont(font);
-	ammoText.setCharacterSize(55);
-	ammoText.setFillColor(Color::White);
-	ammoText.setPosition(200, 980);
-
-	// Score
-	Text scoreText;
-	scoreText.setFont(font);
-	scoreText.setCharacterSize(55);
-	scoreText.setFillColor(Color::White);
-	scoreText.setPosition(20, 0);
+	LText pausedText(strFontFile, Color::White, 155, 400, 400, "Press Enter \nto continue"); // Paused
+	LText gameOverText(strFontFile, Color::White, 125, 250, 650, "Play <ENTER>\nEsc <exit>"); // Paused
+	LText levelUpText(strFontFile, Color::White, 80, 150, 250, "1- Increased rate of fire\n2- Increased clip size\n3- Increased max health\n4- Increased run speed\n5- More and better health pickups\n6- More and better ammo pickups"); // Levelling up
+	LText ammoText(strFontFile, Color::White, 55, 200, 980, "Press Enter \nto continue"); // Ammo
+	LText scoreText(strFontFile, Color::White, 55, 20, 0, "Press Enter \nto continue"); // Score
 
 	// Load the high score from a text file/
 	std::ifstream inputFile("gamedata/scores.txt");
@@ -149,32 +114,13 @@ int main()
 		inputFile.close();
 	}
 
-	// Hi Score
-	Text hiScoreText;
-	hiScoreText.setFont(font);
-	hiScoreText.setCharacterSize(55);
-	hiScoreText.setFillColor(Color::White);
-	hiScoreText.setPosition(1400, 0);
 	std::stringstream s;
 	s << "Hi Score:" << hiScore;
-	hiScoreText.setString(s.str());
+	LText hiScoreText(strFontFile, Color::White, 55, 1400, 0, s.str()); // Hi Score
+	LText zombiesRemainingText(strFontFile, Color::White, 55, 1500, 980, "Zombies: 100"); // Zombies remaining
 
-	// Zombies remaining
-	Text zombiesRemainingText;
-	zombiesRemainingText.setFont(font);
-	zombiesRemainingText.setCharacterSize(55);
-	zombiesRemainingText.setFillColor(Color::White);
-	zombiesRemainingText.setPosition(1500, 980);
-	zombiesRemainingText.setString("Zombies: 100");
-
-	// Wave number
 	int wave = 0;
-	Text waveNumberText;
-	waveNumberText.setFont(font);
-	waveNumberText.setCharacterSize(55);
-	waveNumberText.setFillColor(Color::White);
-	waveNumberText.setPosition(1250, 980);
-	waveNumberText.setString("Wave: 0");
+	LText waveNumberText(strFontFile, Color::White, 55, 1250, 980, "Wave: 0"); // Wave number
 
 	// Health bar
 	RectangleShape healthBar;

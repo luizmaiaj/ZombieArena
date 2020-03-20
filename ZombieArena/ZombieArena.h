@@ -2,6 +2,7 @@
 
 #include "Zombie.h"
 #include "LSound.h"
+#include "LText.h"
 
 using namespace sf;
 
