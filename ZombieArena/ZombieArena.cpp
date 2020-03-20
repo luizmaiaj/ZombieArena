@@ -212,16 +212,12 @@ int main()
 						}
 					}
 				}
-
 			}
 		}// End event polling
 
 
 		 // Handle the player quitting
-		if (Keyboard::isKeyPressed(Keyboard::Escape))
-		{
-			window.close();
-		}
+		if (Keyboard::isKeyPressed(Keyboard::Escape)) window.close();
 
 		// Handle controls while playing
 		if (state == State::PLAYING)
@@ -241,7 +237,6 @@ int main()
 			// Fire a bullet
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
-
 				if (gameTimeTotal.asMilliseconds() - lastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)
 				{
 
@@ -503,11 +498,11 @@ int main()
 			{
 
 				// Update game HUD text
-				std::stringstream ssAmmo;
-				std::stringstream ssScore;
-				std::stringstream ssHiScore;
-				std::stringstream ssWave;
-				std::stringstream ssZombiesAlive;
+				stringstream ssAmmo;
+				stringstream ssScore;
+				stringstream ssHiScore;
+				stringstream ssWave;
+				stringstream ssZombiesAlive;
 
 				// Update the ammo text
 				ssAmmo << bulletsInClip << "/" << bulletsSpare;
@@ -548,31 +543,20 @@ int main()
 			window.draw(background, &textureBackground);
 
 			// Draw the zombies
-			for (int i = 0; i < numZombies; i++)
-			{
-				window.draw(zombies[i].getSprite());
-			}
+			for (int i = 0; i < numZombies; i++) window.draw(zombies[i].getSprite());
 
 			for (int i = 0; i < 100; i++)
 			{
-				if (bullets[i].isInFlight())
-				{
-					window.draw(bullets[i].getShape());
-				}
+				if (bullets[i].isInFlight()) window.draw(bullets[i].getShape());
 			}
 
 			// Draw the player
 			window.draw(player.getSprite());
 
 			// Draw the pickups is currently spawned
-			if (ammoPickup.isSpawned())
-			{
-				window.draw(ammoPickup.getSprite());
-			}
-			if (healthPickup.isSpawned())
-			{
-				window.draw(healthPickup.getSprite());
-			}
+			if (ammoPickup.isSpawned()) window.draw(ammoPickup.getSprite());
+			
+			if (healthPickup.isSpawned()) window.draw(healthPickup.getSprite());
 
 			//Draw the crosshair
 			window.draw(spriteCrosshair);
@@ -690,7 +674,6 @@ Zombie* createHorde(int numZombies, IntRect arena)
 
 	for (int i = 0; i < numZombies; i++)
 	{
-
 		// Which side should the zombie spawn
 		srand((int)time(0) * i);
 		int side = (rand() % 4);
@@ -729,7 +712,6 @@ Zombie* createHorde(int numZombies, IntRect arena)
 
 		// Spawn the new zombie into the array
 		zombies[i].spawn(x, y, type, i);
-
 	}
 	return zombies;
 }

@@ -171,6 +171,35 @@
     <ClInclude Include="Zombie.h" />
     <ClInclude Include="ZombieArena.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\zombiecontrol.ttf" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="graphics\ammo_icon.png" />
+    <Image Include="graphics\ammo_pickup.png" />
+    <Image Include="graphics\background 1280-720.png" />
+    <Image Include="graphics\background.png" />
+    <Image Include="graphics\background_originalsize.png" />
+    <Image Include="graphics\background_sheet.png" />
+    <Image Include="graphics\bloater.png" />
+    <Image Include="graphics\blood.png" />
+    <Image Include="graphics\chaser.png" />
+    <Image Include="graphics\crawler.png" />
+    <Image Include="graphics\crosshair.png" />
+    <Image Include="graphics\health_pickup.png" />
+    <Image Include="graphics\player.png" />
+    <Image Include="graphics\sample.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="sound\footsteps.wav" />
+    <Media Include="sound\hit.wav" />
+    <Media Include="sound\pickup.wav" />
+    <Media Include="sound\powerup.wav" />
+    <Media Include="sound\reload.wav" />
+    <Media Include="sound\reload_failed.wav" />
+    <Media Include="sound\shoot.wav" />
+    <Media Include="sound\splat.wav" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

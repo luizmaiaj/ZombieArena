@@ -66,4 +66,79 @@
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\zombiecontrol.ttf">
+      <Filter>Resource Files</Filter>
+    </Font>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="graphics\ammo_icon.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\ammo_pickup.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\background 1280-720.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\background.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\background_originalsize.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\background_sheet.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\bloater.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\blood.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\chaser.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\crawler.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\crosshair.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\health_pickup.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\player.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="graphics\sample.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="sound\footsteps.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\hit.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\pickup.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\powerup.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\reload.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\reload_failed.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\shoot.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="sound\splat.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+  </ItemGroup>
 </Project>
