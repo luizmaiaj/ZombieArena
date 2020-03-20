@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Zombie.h"
+#include "LSound.h"
 
 using namespace sf;
 

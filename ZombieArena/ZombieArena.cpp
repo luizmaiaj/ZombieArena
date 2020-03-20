@@ -4,15 +4,11 @@
 #include <iostream>
 #include <sstream>
 #include <fstream>
-#include <SFML/Graphics.hpp>
-#include <SFML/Audio.hpp>
 #include "ZombieArena.h"
 #include "Player.h"
 #include "TextureHolder.h"
 #include "Bullet.h"
 #include "Pickup.h"
-
-using namespace sf;
 
 int main()
 {
@@ -192,61 +188,19 @@ int main()
 	// How often (in frames) should we update the HUD
 	int fpsMeasurementFrameInterval = 100;
 
-	// Prepare the hit sound
-	SoundBuffer hitBuffer;
-	hitBuffer.loadFromFile("sound/hit.wav");
-	Sound hit;
-	hit.setBuffer(hitBuffer);
-
-	SoundBuffer fsBuffer;
-	hitBuffer.loadFromFile("sound/footsteps.wav");
-	Sound footsteps;
-	footsteps.setBuffer(fsBuffer);
-
-	// Prepare the splat sound
-	SoundBuffer splatBuffer;
-	splatBuffer.loadFromFile("sound/splat.wav");
-	sf::Sound splat;
-	splat.setBuffer(splatBuffer);
-
-	// Prepare the shoot sound
-	SoundBuffer shootBuffer;
-	shootBuffer.loadFromFile("sound/shoot.wav");
-	Sound shoot;
-	shoot.setBuffer(shootBuffer);
-
-	// Prepare the reload sound
-	SoundBuffer reloadBuffer;
-	reloadBuffer.loadFromFile("sound/reload.wav");
-	Sound reload;
-	reload.setBuffer(reloadBuffer);
-
-	// Prepare the failed sound
-	SoundBuffer reloadFailedBuffer;
-	reloadFailedBuffer.loadFromFile("sound/reload_failed.wav");
-	Sound reloadFailed;
-	reloadFailed.setBuffer(reloadFailedBuffer);
-
-	// Prepare the powerup sound
-	SoundBuffer powerupBuffer;
-	powerupBuffer.loadFromFile("sound/powerup.wav");
-	Sound powerup;
-	powerup.setBuffer(powerupBuffer);
-
-	// Prepare the pickup sound
-	SoundBuffer pickupBuffer;
-	pickupBuffer.loadFromFile("sound/pickup.wav");
-	Sound pickup;
-	pickup.setBuffer(pickupBuffer);
+	LSound hit("sound/hit.wav"); // hit sound
+	LSound footsteps("sound/footsteps.wav"); // footsteps sound
+	LSound splat("sound/splat.wav"); // Prepare the splat sound
+	LSound shoot("sound/shoot.wav"); // Prepare the shoot sound
+	LSound reload("sound/reload.wav"); // Prepare the reload sound
+	LSound reloadFailed("sound/reload_failed.wav"); // Prepare the failed sound
+	LSound powerup("sound/powerup.wav"); // Prepare the powerup sound
+	LSound pickup("sound/pickup.wav"); // Prepare the pickup sound
 
 	// The main game loop
 	while (window.isOpen())
 	{
-		/*
-		************
-		Handle input
-		************
-		*/
+		// HANDLE INPUT
 
 		// Handle events
 		Event event;
@@ -390,44 +344,34 @@ int main()
 		if (state == State::LEVELING_UP)
 		{
 			// Handle the player levelling up
-			if (event.key.code == Keyboard::Num1)
+			switch (event.key.code)
 			{
-				// Increase fire rate
+			case Keyboard::Num1:
 				fireRate++;
 				state = State::PLAYING;
-			}
-
-			if (event.key.code == Keyboard::Num2)
-			{
-				// Increase clip size
+				break;
+			case Keyboard::Num2:
 				clipSize += clipSize;
 				state = State::PLAYING;
-			}
-
-			if (event.key.code == Keyboard::Num3)
-			{
-				// Increase health
+				break;
+			case Keyboard::Num3:
 				player.upgradeHealth();
 				state = State::PLAYING;
-			}
-
-			if (event.key.code == Keyboard::Num4)
-			{
-				// Increase speed
+				break;
+			case Keyboard::Num4:
 				player.upgradeSpeed();
 				state = State::PLAYING;
-			}
-
-			if (event.key.code == Keyboard::Num5)
-			{
+				break;
+			case Keyboard::Num5:
 				healthPickup.upgrade();
 				state = State::PLAYING;
-			}
-
-			if (event.key.code == Keyboard::Num6)
-			{
+				break;
+			case Keyboard::Num6:
 				ammoPickup.upgrade();
 				state = State::PLAYING;
+				break;
+			default:	
+				break;
 			}
 
 			if (state == State::PLAYING)
@@ -469,11 +413,7 @@ int main()
 			}
 		}// End levelling up
 
-		 /*
-		 ****************
-		 UPDATE THE FRAME
-		 ****************
-		 */
+		 // UPDATE THE FRAME
 		if (state == State::PLAYING)
 		{
 			// Update the delta time
@@ -649,12 +589,7 @@ int main()
 
 		}// End updating the scene
 
-		 /*
-		 **************
-		 Draw the scene
-		 **************
-		 */
-
+		 // DRAW THE SCENE
 		if (state == State::PLAYING)
 		{
 			window.clear();
