@@ -9,12 +9,11 @@ Player::Player()
 
 	// Associate a texture with the sprite
 	// !!Watch this space!!
-	m_Sprite = Sprite(TextureHolder::GetTexture(
-		"graphics/player.png"));
+	m_Sprite = Sprite(TextureHolder::GetTexture("graphics/player.png"));
 
 	// Set the origin of the sprite to the centre, 
 	// for smooth rotation
-	m_Sprite.setOrigin(25, 25);
+	m_Sprite.setOrigin(m_Sprite.getLocalBounds().width / 2, m_Sprite.getLocalBounds().height / 2);
 }
 
 void Player::resetPlayerStats()
@@ -47,7 +46,7 @@ void Player::spawn(IntRect arena, Vector2f resolution, int tileSize)
 
 bool Player::isMoving()
 {
-	return 	m_UpPressed || m_DownPressed || m_RightPressed || m_LeftPressed;
+	return (m_UpPressed || m_DownPressed || m_RightPressed || m_LeftPressed);
 }
 
 Time Player::getLastHitTime()

@@ -47,7 +47,7 @@ void Zombie::spawn(float startX, float startY, int type, int seed)
 	m_Position.x = startX;
 	m_Position.y = startY;
 
-	m_Sprite.setOrigin(25, 25);
+	m_Sprite.setOrigin(m_Sprite.getLocalBounds().width / 2, m_Sprite.getLocalBounds().height / 2);
 	m_Sprite.setPosition(m_Position);
 }
 

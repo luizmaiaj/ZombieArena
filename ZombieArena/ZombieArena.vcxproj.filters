@@ -13,6 +13,15 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
+    <Filter Include="Resource Files\graphics">
+      <UniqueIdentifier>{541861dd-6132-45e7-8229-1eca5301ed05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\fonts">
+      <UniqueIdentifier>{c1dc9e03-a253-49d9-a253-d86231440499}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Resource Files\sound">
+      <UniqueIdentifier>{d707124f-b275-428d-afd6-df91194b7db9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Player.cpp">
@@ -67,78 +76,78 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Font Include="fonts\zombiecontrol.ttf">
-      <Filter>Resource Files</Filter>
-    </Font>
-  </ItemGroup>
-  <ItemGroup>
     <Image Include="graphics\ammo_icon.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\ammo_pickup.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\background 1280-720.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\background.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\background_originalsize.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\background_sheet.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\bloater.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\blood.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\chaser.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\crawler.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\crosshair.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\health_pickup.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\player.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
     <Image Include="graphics\sample.png">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\graphics</Filter>
     </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="sound\footsteps.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\hit.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\pickup.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\powerup.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\reload.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\reload_failed.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\shoot.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
     <Media Include="sound\splat.wav">
-      <Filter>Resource Files</Filter>
+      <Filter>Resource Files\sound</Filter>
     </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <Font Include="fonts\zombiecontrol.ttf">
+      <Filter>Resource Files\fonts</Filter>
+    </Font>
   </ItemGroup>
 </Project>

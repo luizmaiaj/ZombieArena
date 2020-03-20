@@ -20,7 +20,6 @@ int main()
 	// Start with the GAME_OVER state
 	State state = State::GAME_OVER;
 
-
 	// Get the screen resolution and create an SFML window
 	Vector2f resolution;
 	resolution.x = (float) VideoMode::getDesktopMode().width;
@@ -142,6 +141,11 @@ int main()
 	LSound reloadFailed("sound/reload_failed.wav"); // Prepare the failed sound
 	LSound powerup("sound/powerup.wav"); // Prepare the powerup sound
 	LSound pickup("sound/pickup.wav"); // Prepare the pickup sound
+	LSound relief("sound/relief.wav"); // relief sound when getting extra health
+	LSound zombie_attack("sound/zombie_attack.wav"); // zombie sound
+	LSound zombie_short("sound/zombie_short.wav"); // zombie sound
+	LSound zombie_short_low("sound/zombie_short_low.wav"); // zombie sound
+	LSound zombie_slow("sound/zombie_slow.wav"); // zombie sound
 
 	// The main game loop
 	while (window.isOpen())
@@ -158,14 +162,14 @@ int main()
 				if (event.key.code == Keyboard::Return && state == State::PLAYING)
 				{
 					state = State::PAUSED;
+					footsteps.stop();
 				}
 
 				// Restart while paused
 				else if (event.key.code == Keyboard::Return && state == State::PAUSED)
 				{
 					state = State::PLAYING;
-					// Reset the clock so there isn't a frame jump
-					clock.restart();
+					clock.restart(); // Reset the clock so there isn't a frame jump
 				}
 
 				// Start a new game while in GAME_OVER state
@@ -185,36 +189,8 @@ int main()
 					// Reset the player's stats
 					player.resetPlayerStats();
 				}
-
-				if (state == State::PLAYING)
-				{
-					// Reloading
-					if (event.key.code == Keyboard::R)
-					{
-						if (bulletsSpare >= clipSize)
-						{
-							// Plenty of bullets. Reload.
-							bulletsInClip = clipSize;
-							bulletsSpare -= clipSize;
-							reload.play();
-						}
-						else if (bulletsSpare > 0)
-						{
-							// Only few bullets left
-							bulletsInClip = bulletsSpare;
-							bulletsSpare = 0;
-							reload.play();
-						}
-						else
-						{
-							// More here soon?!
-							reloadFailed.play();
-						}
-					}
-				}
 			}
 		}// End event polling
-
 
 		 // Handle the player quitting
 		if (Keyboard::isKeyPressed(Keyboard::Escape)) window.close();
@@ -230,9 +206,15 @@ int main()
 
 			if (player.isMoving())
 			{
-				if (footsteps.Playing != SoundSource::Status::Playing) footsteps.play();
+				if (footsteps.getStatus() != Sound::Playing)
+				{
+					footsteps.play();
+				}
 			}
-			else footsteps.stop();
+			else
+			{
+				footsteps.stop();
+			}
 
 			// Fire a bullet
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
@@ -274,7 +256,6 @@ int main()
 				}
 				else
 				{
-					// More here soon?!
 					reloadFailed.play();
 				}
 			}
@@ -320,7 +301,7 @@ int main()
 				// Increase the wave number
 				wave++;
 
-				// Prepare thelevel
+				// Prepare the level
 				// We will modify the next two lines later
 				arena.width = 500 * wave;
 				arena.height = 500 * wave;
@@ -385,19 +366,13 @@ int main()
 			// Loop through each Zombie and update them
 			for (int i = 0; i < numZombies; i++)
 			{
-				if (zombies[i].isAlive())
-				{
-					zombies[i].update(dt.asSeconds(), playerPosition);
-				}
+				if (zombies[i].isAlive()) zombies[i].update(dt.asSeconds(), playerPosition);
 			}
 
 			// Update any bullets that are in-flight
 			for (int i = 0; i < 100; i++)
 			{
-				if (bullets[i].isInFlight())
-				{
-					bullets[i].update(dtAsSeconds);
-				}
+				if (bullets[i].isInFlight()) bullets[i].update(dtAsSeconds);
 			}
 
 			// Update the pickups
@@ -410,17 +385,16 @@ int main()
 			{
 				for (int j = 0; j < numZombies; j++)
 				{
-					if (bullets[i].isInFlight() &&
-						zombies[j].isAlive())
+					if (bullets[i].isInFlight() && zombies[j].isAlive())
 					{
-						if (bullets[i].getPosition().intersects
-						(zombies[j].getPosition()))
+						if (bullets[i].getPosition().intersects(zombies[j].getPosition()))
 						{
 							// Stop the bullet
 							bullets[i].stop();
 
 							// Register the hit and see if it was a kill
-							if (zombies[j].hit()) {
+							if (zombies[j].hit())
+							{
 								// Not just a hit but a kill too
 								score += 10;
 								if (score >= hiScore)
@@ -431,7 +405,8 @@ int main()
 								numZombiesAlive--;
 
 								// When all the zombies are dead (again)
-								if (numZombiesAlive == 0) {
+								if (numZombiesAlive == 0)
+								{
 									state = State::LEVELING_UP;
 								}
 							}
@@ -447,15 +422,9 @@ int main()
 			// Have any zombies touched the player			
 			for (int i = 0; i < numZombies; i++)
 			{
-				if (player.getPosition().intersects
-				(zombies[i].getPosition()) && zombies[i].isAlive())
+				if (player.getPosition().intersects(zombies[i].getPosition()) && zombies[i].isAlive())
 				{
-
-					if (player.hit(gameTimeTotal))
-					{
-						// More here later
-						hit.play();
-					}
+					if (player.hit(gameTimeTotal)) hit.play();
 
 					if (player.getHealth() <= 0)
 					{
@@ -474,16 +443,14 @@ int main()
 			if (player.getPosition().intersects(healthPickup.getPosition()) && healthPickup.isSpawned())
 			{
 				player.increaseHealthLevel(healthPickup.gotIt());
-				// Play a sound
-				pickup.play();
+				relief.play(); // Play a sound
 			}
 
 			// Has the player touched ammo pickup
 			if (player.getPosition().intersects(ammoPickup.getPosition()) && ammoPickup.isSpawned())
 			{
 				bulletsSpare += ammoPickup.gotIt();
-				// Play a sound
-				reload.play();
+				reload.play(); // Play a sound
 			}
 
 			// size up the health bar
@@ -496,7 +463,6 @@ int main()
 			// Calculate FPS every fpsMeasurementFrameInterval frames
 			if (framesSinceLastHUDUpdate > fpsMeasurementFrameInterval)
 			{
-
 				// Update game HUD text
 				stringstream ssAmmo;
 				stringstream ssScore;
@@ -527,7 +493,6 @@ int main()
 				framesSinceLastHUDUpdate = 0;
 				timeSinceLastUpdate = Time::Zero;
 			}// End HUD update
-
 		}// End updating the scene
 
 		 // DRAW THE SCENE
@@ -602,10 +567,7 @@ int main()
 
 int createBackground(VertexArray& rVA, IntRect arena)
 {
-	// Anything we do to rVA we are actually doing to background (in the main function)
-
 	// How big is each tile/texture
-	const int TILE_SIZE = 50;
 	const int TILE_TYPES = 3;
 	const int VERTS_IN_QUAD = 4;
 
@@ -626,7 +588,7 @@ int createBackground(VertexArray& rVA, IntRect arena)
 		for (int h = 0; h < worldHeight; h++)
 		{
 			// Position each vertex in the current quad
-			rVA[currentVertex + 0].position = Vector2f((float) w * TILE_SIZE, (float) h * TILE_SIZE);
+			rVA[currentVertex + 0].position = Vector2f((float) (w * TILE_SIZE), (float) h * TILE_SIZE);
 			rVA[currentVertex + 1].position = Vector2f((float) (w * TILE_SIZE) + TILE_SIZE, (float) h * TILE_SIZE);
 			rVA[currentVertex + 2].position = Vector2f((float) (w * TILE_SIZE) + TILE_SIZE, (float) (h * TILE_SIZE) + TILE_SIZE);
 			rVA[currentVertex + 3].position = Vector2f((float) (w * TILE_SIZE), (float) (h * TILE_SIZE) + TILE_SIZE);
@@ -652,7 +614,6 @@ int createBackground(VertexArray& rVA, IntRect arena)
 				rVA[currentVertex + 1].texCoords = Vector2f((float) TILE_SIZE, (float) 0 + verticalOffset);
 				rVA[currentVertex + 2].texCoords = Vector2f((float) TILE_SIZE, (float) TILE_SIZE + verticalOffset);
 				rVA[currentVertex + 3].texCoords = Vector2f((float) 0, (float) TILE_SIZE + verticalOffset);
-
 			}
 
 			// Position ready for the next for vertices

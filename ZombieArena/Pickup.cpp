@@ -9,8 +9,7 @@ Pickup::Pickup(int type)
 	// Associate the texture with the sprite
 	if (m_Type == 1)
 	{
-		m_Sprite = Sprite(TextureHolder::GetTexture(
-			"graphics/health_pickup.png"));
+		m_Sprite = Sprite(TextureHolder::GetTexture("graphics/health_pickup.png"));
 
 		// How much is pickup worth
 		m_Value = HEALTH_START_VALUE;
@@ -18,8 +17,7 @@ Pickup::Pickup(int type)
 	}
 	else
 	{
-		m_Sprite = Sprite(TextureHolder::GetTexture(
-			"graphics/ammo_pickup.png"));
+		m_Sprite = Sprite(TextureHolder::GetTexture("graphics/ammo_pickup.png"));
 
 		// How much is pickup worth
 		m_Value = AMMO_START_VALUE;
@@ -35,10 +33,8 @@ void Pickup::setArena(IntRect arena)
 {
 
 	// Copy the details of the arena to the pickup's m_Arena
-	m_Arena.left = arena.left + 50;
-	m_Arena.width = arena.width - 50;
-	m_Arena.top = arena.top + 50;
-	m_Arena.height = arena.height - 50;
+	m_Arena.width = arena.width - (2 * TILE_SIZE);
+	m_Arena.height = arena.height - (2 * TILE_SIZE);
 
 	spawn();
 }
@@ -47,9 +43,9 @@ void Pickup::spawn()
 {
 	// Spawn at a random location
 	srand((int)time(0) / m_Type);
-	float x = (float) (rand() % m_Arena.width);
+	float x = (float) ((rand() % m_Arena.width) + TILE_SIZE);
 	srand((int)time(0) * m_Type);
-	float y = (float) (rand() % m_Arena.height);
+	float y = (float) ((rand() % m_Arena.height) + TILE_SIZE);
 
 	// Not currently spawned
 	//m_Spawned = false;
@@ -92,7 +88,6 @@ void Pickup::update(float elapsedTime)
 		m_SecondsSinceDeSpawn += elapsedTime;
 	}
 
-
 	// Do we need to hide a pickup?
 	if (m_SecondsSinceSpawn > m_SecondsToLive && m_Spawned)
 	{
@@ -107,7 +102,6 @@ void Pickup::update(float elapsedTime)
 		// spawn the pickup and reset the timer
 		spawn();
 	}
-
 }
 
 void Pickup::upgrade()

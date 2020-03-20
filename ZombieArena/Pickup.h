@@ -1,6 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
+const int TILE_SIZE = 50;
+
 using namespace sf;
 
 class Pickup
