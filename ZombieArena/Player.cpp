@@ -45,6 +45,11 @@ void Player::spawn(IntRect arena, Vector2f resolution, int tileSize)
 
 }
 
+bool Player::isMoving()
+{
+	return 	m_UpPressed || m_DownPressed || m_RightPressed || m_LeftPressed;
+}
+
 Time Player::getLastHitTime()
 {
 	return m_LastHit;
@@ -134,8 +139,6 @@ void Player::update(float elapsedTime, Vector2i mousePosition)
 	}
 
 	m_Sprite.setPosition(m_Position);
-
-
 
 	// Keep the player in the arena
 	if (m_Position.x > m_Arena.width - m_TileSize)

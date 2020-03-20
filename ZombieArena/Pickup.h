@@ -34,7 +34,6 @@ private:
 
 	// Public prototypes go here
 public:
-
 	Pickup(int type);
 
 	// Prepare a new pickup

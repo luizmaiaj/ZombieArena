@@ -47,7 +47,6 @@ private:
 	// Speed in pixels per second
 	float m_Speed{ START_SPEED };
 
-
 	// All our public functions will come next
 public:
 
@@ -57,6 +56,8 @@ public:
 	void resetPlayerStats();
 
 	void spawn(IntRect arena, Vector2f resolution, int tileSize);
+
+	bool isMoving();
 
 	// Handle the player getting hit by a zombie
 	bool hit(Time timeHit);

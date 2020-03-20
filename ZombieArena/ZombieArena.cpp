@@ -1,4 +1,4 @@
-// HelloSFML.cpp : This file contains the 'main' function. Program execution begins and ends there.
+// ZombieArena.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
 #include <iostream>
@@ -54,8 +54,7 @@ int main()
 	// Create the background
 	VertexArray background;
 	// Load the texture for our background vertex array
-	Texture textureBackground = TextureHolder::GetTexture(
-		"graphics/background_sheet.png");
+	Texture textureBackground = TextureHolder::GetTexture("graphics/background_sheet.png");
 
 	// Prepare for a horde of zombies
 	int numZombies;
@@ -119,8 +118,8 @@ int main()
 	gameOverText.setFont(font);
 	gameOverText.setCharacterSize(125);
 	gameOverText.setFillColor(Color::White);
-	gameOverText.setPosition(250, 850);
-	gameOverText.setString("Press Enter to play");
+	gameOverText.setPosition(250, 650);
+	gameOverText.setString("Play <ENTER>\nEsc <exit>");
 
 	// Levelling up
 	Text levelUpText;
@@ -191,13 +190,18 @@ int main()
 	// What time was the last update
 	Time timeSinceLastUpdate;
 	// How often (in frames) should we update the HUD
-	int fpsMeasurementFrameInterval = 1000;
+	int fpsMeasurementFrameInterval = 100;
 
 	// Prepare the hit sound
 	SoundBuffer hitBuffer;
 	hitBuffer.loadFromFile("sound/hit.wav");
 	Sound hit;
 	hit.setBuffer(hitBuffer);
+
+	SoundBuffer fsBuffer;
+	hitBuffer.loadFromFile("sound/footsteps.wav");
+	Sound footsteps;
+	footsteps.setBuffer(fsBuffer);
 
 	// Prepare the splat sound
 	SoundBuffer splatBuffer;
@@ -328,6 +332,12 @@ int main()
 			player.moveLeft(Keyboard::isKeyPressed(Keyboard::Q));
 			player.moveRight(Keyboard::isKeyPressed(Keyboard::D));
 
+			if (player.isMoving())
+			{
+				if (footsteps.Playing != SoundSource::Status::Playing) footsteps.play();
+			}
+			else footsteps.stop();
+
 			// Fire a bullet
 			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
 			{
@@ -342,10 +352,8 @@ int main()
 						mouseWorldPosition.x, mouseWorldPosition.y);
 
 					currentBullet++;
-					if (currentBullet > 99)
-					{
-						currentBullet = 0;
-					}
+					if (currentBullet > 99) currentBullet = 0;
+
 					lastPressed = gameTimeTotal;
 					shoot.play();
 					bulletsInClip--;
@@ -479,8 +487,7 @@ int main()
 			mouseScreenPosition = Mouse::getPosition();
 
 			// Convert mouse position to world coordinates of mainView
-			mouseWorldPosition = window.mapPixelToCoords(
-				Mouse::getPosition(), mainView);
+			mouseWorldPosition = window.mapPixelToCoords(Mouse::getPosition(), mainView);
 
 			// Set the crosshair to the mouse world location
 			spriteCrosshair.setPosition(mouseWorldPosition);
@@ -550,7 +557,6 @@ int main()
 
 							// Make a splat sound
 							splat.play();
-
 						}
 					}
 
@@ -578,28 +584,25 @@ int main()
 						outputFile << hiScore;
 						outputFile.close();
 
+						footsteps.stop();
 					}
 				}
 			}// End player touched
 
 			// Has the player touched health pickup
-			if (player.getPosition().intersects
-			(healthPickup.getPosition()) && healthPickup.isSpawned())
+			if (player.getPosition().intersects(healthPickup.getPosition()) && healthPickup.isSpawned())
 			{
 				player.increaseHealthLevel(healthPickup.gotIt());
 				// Play a sound
 				pickup.play();
-
 			}
 
 			// Has the player touched ammo pickup
-			if (player.getPosition().intersects
-			(ammoPickup.getPosition()) && ammoPickup.isSpawned())
+			if (player.getPosition().intersects(ammoPickup.getPosition()) && ammoPickup.isSpawned())
 			{
 				bulletsSpare += ammoPickup.gotIt();
 				// Play a sound
 				reload.play();
-
 			}
 
 			// size up the health bar
