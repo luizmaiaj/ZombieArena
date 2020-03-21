@@ -81,6 +81,8 @@ public:
 	int getHealth();
 
 	// The next four functions move the player
+	void moveX(float aX);
+	void moveY(float aY);
 	void moveLeft( bool aMove );
 	void moveRight( bool aMove );
 	void moveUp( bool aMove );

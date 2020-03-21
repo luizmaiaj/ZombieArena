@@ -15,6 +15,9 @@ int main()
 	// Here is the instabce of TextureHolder
 	TextureHolder holder;
 
+	Joystick js;
+	unsigned int uijsButtons = 0;
+
 	// The game will always be in one of four states
 	enum class State { PAUSED, LEVELING_UP, GAME_OVER, PLAYING };
 	// Start with the GAME_OVER state
@@ -168,20 +171,12 @@ int main()
 		{
 			if (event.type == Event::KeyPressed)
 			{
-				// Pause a game while playing
-				if (event.key.code == Keyboard::Return && state == State::PLAYING)
-				{
-					state = State::PAUSED;
-					footsteps.stop();
-				}
-
 				// Restart while paused
-				else if (event.key.code == Keyboard::Return && state == State::PAUSED)
+				if (event.key.code == Keyboard::Return && state == State::PAUSED)
 				{
 					state = State::PLAYING;
 					clock.restart(); // Reset the clock so there isn't a frame jump
 				}
-
 				// Start a new game while in GAME_OVER state
 				else if (event.key.code == Keyboard::Return && state == State::GAME_OVER)
 				{
@@ -200,77 +195,104 @@ int main()
 					player.resetPlayerStats();
 				}
 			}
+			
+			if (state == State::PLAYING)
+			{
+				switch (event.type)
+				{
+				case Event::KeyPressed:
+				case Event::KeyReleased:
+					if (event.key.code == Keyboard::Return) // pause game
+					{
+						state = State::PAUSED;
+						footsteps.stop();
+					}
+					else // move player with keyboard
+					{
+						player.moveUp(Keyboard::isKeyPressed(Keyboard::Z));
+						player.moveDown(Keyboard::isKeyPressed(Keyboard::S));
+						player.moveLeft(Keyboard::isKeyPressed(Keyboard::Q));
+						player.moveRight(Keyboard::isKeyPressed(Keyboard::D));
+					}
+					break;
+				case Event::MouseButtonPressed:
+				case Event::MouseButtonReleased:
+					if (Mouse::isButtonPressed(sf::Mouse::Left)) // Fire a bullet
+					{
+						if (gameTimeTotal.asMilliseconds() - lastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)
+						{
+							bullets[currentBullet].shoot(player.getCenter().x, player.getCenter().y, mouseWorldPosition.x, mouseWorldPosition.y);
+
+							currentBullet++;
+							if (currentBullet > 99) currentBullet = 0;
+
+							lastPressed = gameTimeTotal;
+							shoot.play();
+							bulletsInClip--;
+						}
+					}
+					else if (Mouse::isButtonPressed(sf::Mouse::Right))
+					{
+						if (bulletsInClip < clipSize)
+						{
+							int iToReload = clipSize - bulletsInClip;
+
+							if (iToReload <= bulletsSpare)
+							{
+								bulletsInClip += iToReload;
+								bulletsSpare -= iToReload;
+								reload.play();
+							}
+							else
+							{
+								bulletsInClip += bulletsSpare;
+								bulletsSpare = 0;
+								reload.play();
+							}
+						}
+						else
+							reloadFailed.play();
+					}
+					break;
+				case Event::JoystickConnected:
+					js.update();
+					uijsButtons = js.getButtonCount(0);
+					break;
+				case Event::JoystickDisconnected:
+					uijsButtons = 0;
+					break;
+				case Event::JoystickMoved:
+					if (event.joystickMove.axis == sf::Joystick::Axis::PovX)
+					{
+						player.moveX(event.joystickMove.position);
+					}
+					else if (event.joystickMove.axis == sf::Joystick::Axis::PovY)
+					{
+						player.moveY(event.joystickMove.position);
+					}
+					break;
+				case Event::JoystickButtonPressed:
+					for (unsigned int jsb = 0; jsb < uijsButtons; jsb++)
+					{
+						if (js.isButtonPressed(0, jsb))
+							cout << "button: " << jsb << "\n";
+					}
+					break;
+				}
+			}
 		}// End event polling
 
 		 // Handle the player quitting
 		if (Keyboard::isKeyPressed(Keyboard::Escape)) window.close();
 
-		// Handle controls while playing
-		if (state == State::PLAYING)
+		if (player.isMoving())
 		{
-			// Handle the pressing and releasing of the WASD keys
-			player.moveUp(Keyboard::isKeyPressed(Keyboard::Z));
-			player.moveDown(Keyboard::isKeyPressed(Keyboard::S));
-			player.moveLeft(Keyboard::isKeyPressed(Keyboard::Q));
-			player.moveRight(Keyboard::isKeyPressed(Keyboard::D));
-
-			if (player.isMoving())
-			{
-				if (footsteps.getStatus() != Sound::Playing)
-				{
-					footsteps.play();
-				}
-			}
-			else
-			{
-				footsteps.stop();
-			}
-
-			// Fire a bullet
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
-			{
-				if (gameTimeTotal.asMilliseconds() - lastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)
-				{
-
-					// Pass the centre of the player and the centre of the crosshair
-					// to the shoot function
-					bullets[currentBullet].shoot(
-						player.getCenter().x, player.getCenter().y,
-						mouseWorldPosition.x, mouseWorldPosition.y);
-
-					currentBullet++;
-					if (currentBullet > 99) currentBullet = 0;
-
-					lastPressed = gameTimeTotal;
-					shoot.play();
-					bulletsInClip--;
-				}
-
-			}// End fire a bullet
-
-			if (sf::Mouse::isButtonPressed(sf::Mouse::Right))
-			{
-				if (bulletsSpare >= clipSize)
-				{
-					// Plenty of bullets. Reload.
-					bulletsInClip = clipSize;
-					bulletsSpare -= clipSize;
-					reload.play();
-				}
-				else if (bulletsSpare > 0)
-				{
-					// Only few bullets left
-					bulletsInClip = bulletsSpare;
-					bulletsSpare = 0;
-					reload.play();
-				}
-				else
-				{
-					reloadFailed.play();
-				}
-			}
-
-		}// End WASD while playing
+			if (footsteps.getStatus() != Sound::Playing) footsteps.play();
+		}
+		else
+		{
+			footsteps.stop();
+		}
 
 		// Handle the levelling up state
 		if (state == State::LEVELING_UP)
@@ -436,7 +458,7 @@ int main()
 			{
 				if (player.getPosition().intersects(zombies[i].getPosition()) && zombies[i].isAlive())
 				{
-					if (player.hit(gameTimeTotal)) hit.play();
+					//if (player.hit(gameTimeTotal)) hit.play();
 
 					if (player.getHealth() <= 0)
 					{

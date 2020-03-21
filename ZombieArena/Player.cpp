@@ -94,6 +94,18 @@ int Player::getHealth()
 	return m_Health;
 }
 
+void Player::moveX(float aX)
+{
+	m_LeftPressed = aX < 0;
+	m_RightPressed = aX > 0;
+}
+
+void Player::moveY(float aY)
+{
+	m_UpPressed = aY > 0;
+	m_DownPressed = aY < 0;
+}
+
 void Player::moveLeft(bool aMove)
 {
 	m_LeftPressed = aMove;
