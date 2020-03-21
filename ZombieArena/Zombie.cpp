@@ -1,9 +1,14 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+
 #include "Zombie.h"
 #include "TextureHolder.h"
 #include <cstdlib>
 #include <ctime>
 
 using namespace std;
+
+const float M_180_PI = 180.f / (float) M_PI;
 
 void Zombie::spawn(float startX, float startY, int type, int seed)
 {
@@ -84,8 +89,7 @@ Sprite Zombie::getSprite()
 	return m_Sprite;
 }
 
-void Zombie::update(float elapsedTime,
-	Vector2f playerLocation)
+void Zombie::update(float elapsedTime, Vector2f playerLocation)
 {
 	float playerX = playerLocation.x;
 	float playerY = playerLocation.y;
@@ -115,7 +119,7 @@ void Zombie::update(float elapsedTime,
 	m_Sprite.setPosition(m_Position);
 
 	// Face the sprite in the correct direction
-	float angle = (float) ((atan2(playerY - m_Position.y, playerX - m_Position.x) * 180) / 3.141);
+	float angle = atan2(playerY - m_Position.y, playerX - m_Position.x) * M_180_PI;
 
 	m_Sprite.setRotation(angle);
 }

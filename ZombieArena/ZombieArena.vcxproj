@@ -156,6 +156,7 @@
     <ClCompile Include="LSound.cpp" />
     <ClCompile Include="LText.cpp" />
     <ClCompile Include="Pickup.cpp" />
+    <ClCompile Include="SoundManager.cpp" />
     <ClCompile Include="TextureHolder.cpp" />
     <ClCompile Include="Zombie.cpp" />
     <ClCompile Include="ZombieArena.cpp" />
@@ -167,6 +168,7 @@
     <ClInclude Include="LText.h" />
     <ClInclude Include="Pickup.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="SoundManager.h" />
     <ClInclude Include="TextureHolder.h" />
     <ClInclude Include="Zombie.h" />
     <ClInclude Include="ZombieArena.h" />

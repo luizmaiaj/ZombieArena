@@ -142,10 +142,20 @@ int main()
 	LSound powerup("sound/powerup.wav"); // Prepare the powerup sound
 	LSound pickup("sound/pickup.wav"); // Prepare the pickup sound
 	LSound relief("sound/relief.wav"); // relief sound when getting extra health
-	LSound zombie_attack("sound/zombie_attack.wav"); // zombie sound
-	LSound zombie_short("sound/zombie_short.wav"); // zombie sound
-	LSound zombie_short_low("sound/zombie_short_low.wav"); // zombie sound
-	LSound zombie_slow("sound/zombie_slow.wav"); // zombie sound
+
+	SoundManager smZombie;
+
+	LSound* pZ = new LSound("sound/zombie_attack.wav"); // zombie sound
+	smZombie.push_back(pZ);
+
+	pZ = new LSound("sound/zombie_short.wav"); // zombie sound
+	smZombie.push_back(pZ);
+
+	pZ = new LSound("sound/zombie_short_low.wav"); // zombie sound
+	smZombie.push_back(pZ);
+
+	pZ = new LSound("sound/zombie_slow.wav"); // zombie sound
+	smZombie.push_back(pZ);
 
 	// The main game loop
 	while (window.isOpen())
@@ -344,6 +354,8 @@ int main()
 			gameTimeTotal += dt;
 			// Make a decimal fraction of 1 from the delta time
 			float dtAsSeconds = dt.asSeconds();
+
+			smZombie.play(dtAsSeconds);
 
 			// Where is the mouse pointer
 			mouseScreenPosition = Mouse::getPosition();
