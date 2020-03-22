@@ -148,18 +148,10 @@ int main()
 	LSound relief("sound/relief.wav"); // relief sound when getting extra health
 
 	SoundManager smZombie;
-
-	LSound* pZ = new LSound("sound/zombie_attack.wav"); // zombie sound
-	smZombie.push_back(pZ);
-
-	pZ = new LSound("sound/zombie_short.wav"); // zombie sound
-	smZombie.push_back(pZ);
-
-	pZ = new LSound("sound/zombie_short_low.wav"); // zombie sound
-	smZombie.push_back(pZ);
-
-	pZ = new LSound("sound/zombie_slow.wav"); // zombie sound
-	smZombie.push_back(pZ);
+	smZombie.pushback("sound/zombie_attack.wav");
+	smZombie.pushback("sound/zombie_short.wav");
+	smZombie.pushback("sound/zombie_short_low.wav");
+	smZombie.pushback("sound/zombie_slow.wav");
 
 	// The main game loop
 	while (window.isOpen())
@@ -310,22 +302,25 @@ int main()
 						{
 							if (bulletsInClip < clipSize)
 							{
+								bool bReloaded = false;
 								int iToReload = clipSize - bulletsInClip;
 
 								if (iToReload <= bulletsSpare)
 								{
-									rightLastPressed = gameTimeTotal;
-
+									bReloaded = true;
 									bulletsInClip += iToReload;
 									bulletsSpare -= iToReload;
-									reload.play();
 								}
 								else
 								{
-									rightLastPressed = gameTimeTotal;
-
+									bReloaded = true;
 									bulletsInClip += bulletsSpare;
 									bulletsSpare = 0;
+								}
+
+								if (bReloaded)
+								{
+									rightLastPressed = gameTimeTotal;
 									reload.play();
 								}
 							}
@@ -452,7 +447,6 @@ int main()
 							splat.play();
 						}
 					}
-
 				}
 			}// End zombie being shot
 
@@ -490,13 +484,11 @@ int main()
 				reload.play(); // Play a sound
 			}
 
-			// size up the health bar
-			healthBar.setSize(Vector2f((float) player.getHealth() * 3, 70.f));
+			healthBar.setSize(Vector2f((float) player.getHealth() * 3, 70.f)); // size up the health bar
+			
+			timeSinceLastUpdate += dt; // Increment the amount of time since the last HUD update
+			framesSinceLastHUDUpdate++; // Increment the number of frames since the last HUD calculation
 
-			// Increment the amount of time since the last HUD update
-			timeSinceLastUpdate += dt;
-			// Increment the number of frames since the last HUD calculation
-			framesSinceLastHUDUpdate++;
 			// Calculate FPS every fpsMeasurementFrameInterval frames
 			if (framesSinceLastHUDUpdate > fpsMeasurementFrameInterval)
 			{
@@ -537,8 +529,7 @@ int main()
 		{
 			window.clear();
 
-			// set the mainView to be displayed in the window
-			// And draw everything related to it
+			// set the mainView to be displayed in the window and draw everything related to it
 			window.setView(mainView);
 
 			// Draw the background

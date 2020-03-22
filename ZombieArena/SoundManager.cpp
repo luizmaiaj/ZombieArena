@@ -29,3 +29,9 @@ void SoundManager::play(float aDT)
 		}
 	}
 }
+
+void SoundManager::pushback(string aFile)
+{
+	LSound* pZ = new LSound(aFile); // zombie sound
+	push_back(pZ);
+}

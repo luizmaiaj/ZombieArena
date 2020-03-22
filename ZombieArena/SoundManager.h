@@ -13,6 +13,7 @@ class SoundManager :
 public:
 	SoundManager() {};
 	void play(float aDT);
+	void pushback(string aFile);
 
 private:
 	float m_Time{ 0.f };
