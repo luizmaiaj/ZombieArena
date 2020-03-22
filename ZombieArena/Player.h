@@ -81,12 +81,9 @@ public:
 	int getHealth();
 
 	// The next four functions move the player
+	void move(Keyboard::Key aKey, bool aPressed);
 	void moveX(float aX);
 	void moveY(float aY);
-	void moveLeft( bool aMove );
-	void moveRight( bool aMove );
-	void moveUp( bool aMove );
-	void moveDown( bool aMove );
 
 	// We will call this function once every frame
 	void update(float elapsedTime, Vector2i mousePosition);

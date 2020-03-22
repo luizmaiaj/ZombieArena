@@ -67,7 +67,8 @@ int main()
 	int clipSize = 6;
 	float fireRate = 1;
 	// When was the fire button last pressed?
-	Time lastPressed;
+	Time leftLastPressed;
+	Time rightLastPressed;
 
 	// Hide the mouse pointer and replace it with crosshair
 	window.setMouseCursorVisible(true);
@@ -163,40 +164,115 @@ int main()
 	// The main game loop
 	while (window.isOpen())
 	{
-		// HANDLE INPUT
+		// Update the delta time
+		Time dt = clock.restart();
+		// Update the total game time
+		gameTimeTotal += dt;
 
 		// Handle events
 		Event event;
 		while (window.pollEvent(event))
 		{
-			if (event.type == Event::KeyPressed)
+			if (state == State::PAUSED)
 			{
-				// Restart while paused
-				if (event.key.code == Keyboard::Return && state == State::PAUSED)
+				switch (event.type)
 				{
-					state = State::PLAYING;
-					clock.restart(); // Reset the clock so there isn't a frame jump
-				}
-				// Start a new game while in GAME_OVER state
-				else if (event.key.code == Keyboard::Return && state == State::GAME_OVER)
-				{
-					state = State::LEVELING_UP;
-					wave = 0;
-					score = 0;
-
-					// Prepare the gun and ammo for next game
-					currentBullet = 0;
-					bulletsSpare = 24;
-					bulletsInClip = 6;
-					clipSize = 6;
-					fireRate = 1;
-
-					// Reset the player's stats
-					player.resetPlayerStats();
+				case Event::KeyPressed:
+					if (event.key.code == Keyboard::Return) // Restart while paused
+					{
+						state = State::PLAYING;
+						clock.restart(); // Reset the clock so there isn't a frame jump
+					}
+					break;
 				}
 			}
-			
-			if (state == State::PLAYING)
+			else if (state == State::GAME_OVER)
+			{
+				switch (event.type)
+				{
+				case Event::KeyPressed:
+					if (event.key.code == Keyboard::Return) // Start a new game
+					{
+						state = State::LEVELING_UP;
+						wave = 0;
+						score = 0;
+
+						// Prepare the gun and ammo for next game
+						currentBullet = 0;
+						bulletsSpare = 24;
+						bulletsInClip = 6;
+						clipSize = 6;
+						fireRate = 1;
+
+						player.resetPlayerStats(); // Reset the player's stats
+					}
+					break;
+				}
+			}
+			else if (state == State::LEVELING_UP) // Handle the levelling up state
+			{
+				if (event.type == Event::KeyPressed)
+				{
+					switch (event.key.code) // Handle the player levelling up
+					{
+					case Keyboard::Num1:
+						fireRate++;
+						state = State::PLAYING;
+						break;
+					case Keyboard::Num2:
+						clipSize += clipSize;
+						state = State::PLAYING;
+						break;
+					case Keyboard::Num3:
+						player.upgradeHealth();
+						state = State::PLAYING;
+						break;
+					case Keyboard::Num4:
+						player.upgradeSpeed();
+						state = State::PLAYING;
+						break;
+					case Keyboard::Num5:
+						healthPickup.upgrade();
+						state = State::PLAYING;
+						break;
+					case Keyboard::Num6:
+						ammoPickup.upgrade();
+						state = State::PLAYING;
+						break;
+					}
+				}
+
+				if (state == State::PLAYING)
+				{
+					wave++; // Increase the wave number
+
+					// Prepare the level
+					arena.width = 500 * wave;
+					arena.height = 500 * wave;
+					arena.left = 0;
+					arena.top = 0;
+
+					// Pass the vertex array by reference to the createBackground function
+					int tileSize = createBackground(background, arena);
+
+					player.spawn(arena, resolution, tileSize); // Spawn the player in the middle of the arena
+
+					// Configure the pick-ups
+					healthPickup.setArena(arena);
+					ammoPickup.setArena(arena);
+
+					numZombies = 5 * wave; // Create a horde of zombies
+
+					delete[] zombies; // Delete the previously allocated memory (if it exists)
+					zombies = createHorde(numZombies, arena);
+					numZombiesAlive = numZombies;
+
+					powerup.play(); // Play the powerup sound
+
+					clock.restart(); // Reset the clock so there isn't a frame jump
+				}
+			}
+			else if (state == State::PLAYING)
 			{
 				switch (event.type)
 				{
@@ -209,45 +285,49 @@ int main()
 					}
 					else // move player with keyboard
 					{
-						player.moveUp(Keyboard::isKeyPressed(Keyboard::Z));
-						player.moveDown(Keyboard::isKeyPressed(Keyboard::S));
-						player.moveLeft(Keyboard::isKeyPressed(Keyboard::Q));
-						player.moveRight(Keyboard::isKeyPressed(Keyboard::D));
+						player.move(event.key.code, (event.type == Event::KeyPressed)?true:false);
 					}
 					break;
 				case Event::MouseButtonPressed:
 				case Event::MouseButtonReleased:
 					if (Mouse::isButtonPressed(sf::Mouse::Left)) // Fire a bullet
 					{
-						if (gameTimeTotal.asMilliseconds() - lastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)
+						if (gameTimeTotal.asMilliseconds() - leftLastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)
 						{
 							bullets[currentBullet].shoot(player.getCenter().x, player.getCenter().y, mouseWorldPosition.x, mouseWorldPosition.y);
 
 							currentBullet++;
 							if (currentBullet > 99) currentBullet = 0;
 
-							lastPressed = gameTimeTotal;
+							leftLastPressed = gameTimeTotal;
 							shoot.play();
 							bulletsInClip--;
 						}
 					}
 					else if (Mouse::isButtonPressed(sf::Mouse::Right))
 					{
-						if (bulletsInClip < clipSize)
+						if (gameTimeTotal.asMilliseconds() - rightLastPressed.asMilliseconds() > 1000)
 						{
-							int iToReload = clipSize - bulletsInClip;
+							if (bulletsInClip < clipSize)
+							{
+								int iToReload = clipSize - bulletsInClip;
 
-							if (iToReload <= bulletsSpare)
-							{
-								bulletsInClip += iToReload;
-								bulletsSpare -= iToReload;
-								reload.play();
-							}
-							else
-							{
-								bulletsInClip += bulletsSpare;
-								bulletsSpare = 0;
-								reload.play();
+								if (iToReload <= bulletsSpare)
+								{
+									rightLastPressed = gameTimeTotal;
+
+									bulletsInClip += iToReload;
+									bulletsSpare -= iToReload;
+									reload.play();
+								}
+								else
+								{
+									rightLastPressed = gameTimeTotal;
+
+									bulletsInClip += bulletsSpare;
+									bulletsSpare = 0;
+									reload.play();
+								}
 							}
 						}
 						else
@@ -294,86 +374,9 @@ int main()
 			footsteps.stop();
 		}
 
-		// Handle the levelling up state
-		if (state == State::LEVELING_UP)
-		{
-			// Handle the player levelling up
-			switch (event.key.code)
-			{
-			case Keyboard::Num1:
-				fireRate++;
-				state = State::PLAYING;
-				break;
-			case Keyboard::Num2:
-				clipSize += clipSize;
-				state = State::PLAYING;
-				break;
-			case Keyboard::Num3:
-				player.upgradeHealth();
-				state = State::PLAYING;
-				break;
-			case Keyboard::Num4:
-				player.upgradeSpeed();
-				state = State::PLAYING;
-				break;
-			case Keyboard::Num5:
-				healthPickup.upgrade();
-				state = State::PLAYING;
-				break;
-			case Keyboard::Num6:
-				ammoPickup.upgrade();
-				state = State::PLAYING;
-				break;
-			default:	
-				break;
-			}
-
-			if (state == State::PLAYING)
-			{
-				// Increase the wave number
-				wave++;
-
-				// Prepare the level
-				// We will modify the next two lines later
-				arena.width = 500 * wave;
-				arena.height = 500 * wave;
-				arena.left = 0;
-				arena.top = 0;
-
-				// Pass the vertex array by reference 
-				// to the createBackground function
-				int tileSize = createBackground(background, arena);
-
-				// Spawn the player in the middle of the arena
-				player.spawn(arena, resolution, tileSize);
-
-				// Configure the pick-ups
-				healthPickup.setArena(arena);
-				ammoPickup.setArena(arena);
-
-				// Create a horde of zombies
-				numZombies = 5 * wave;
-
-				// Delete the previously allocated memory (if it exists)
-				delete[] zombies;
-				zombies = createHorde(numZombies, arena);
-				numZombiesAlive = numZombies;
-
-				// Play the powerup sound
-				powerup.play();
-
-				// Reset the clock so there isn't a frame jump
-				clock.restart();
-			}
-		}// End levelling up
-
 		 // UPDATE THE FRAME
 		if (state == State::PLAYING)
 		{
-			// Update the delta time
-			Time dt = clock.restart();
-			// Update the total game time
-			gameTimeTotal += dt;
 			// Make a decimal fraction of 1 from the delta time
 			float dtAsSeconds = dt.asSeconds();
 

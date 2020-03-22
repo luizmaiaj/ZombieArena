@@ -94,6 +94,25 @@ int Player::getHealth()
 	return m_Health;
 }
 
+void Player::move(Keyboard::Key aKey, bool aPressed)
+{
+	switch (aKey)
+	{
+	case Keyboard::Z:
+		m_UpPressed = aPressed;
+		break;
+	case Keyboard::S:
+		m_DownPressed = aPressed;
+		break;
+	case Keyboard::Q:
+		m_LeftPressed = aPressed;
+		break;
+	case Keyboard::D:
+		m_RightPressed = aPressed;
+		break;
+	}
+}
+
 void Player::moveX(float aX)
 {
 	m_LeftPressed = aX < 0;
@@ -104,26 +123,6 @@ void Player::moveY(float aY)
 {
 	m_UpPressed = aY > 0;
 	m_DownPressed = aY < 0;
-}
-
-void Player::moveLeft(bool aMove)
-{
-	m_LeftPressed = aMove;
-}
-
-void Player::moveRight(bool aMove)
-{
-	m_RightPressed = aMove;
-}
-
-void Player::moveUp(bool aMove)
-{
-	m_UpPressed = aMove;
-}
-
-void Player::moveDown(bool aMove)
-{
-	m_DownPressed = aMove;
 }
 
 void Player::update(float elapsedTime, Vector2i mousePosition)
