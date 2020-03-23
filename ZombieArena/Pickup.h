@@ -2,18 +2,16 @@
 #include <SFML/Graphics.hpp>
 
 const int TILE_SIZE = 50;
+const int HEALTH_START_VALUE = 50;
+const int AMMO_START_VALUE = 12;
+const int START_WAIT_TIME = 10;
+const int START_SECONDS_TO_LIVE = 5;
 
 using namespace sf;
 
 class Pickup
 {
 private:
-	//Start value for health pickups
-	const int HEALTH_START_VALUE = 50;
-	const int AMMO_START_VALUE = 12;
-	const int START_WAIT_TIME = 10;
-	const int START_SECONDS_TO_LIVE = 5;
-
 	// The sprite that represents this pickup
 	Sprite m_Sprite;
 
@@ -34,7 +32,6 @@ private:
 	float m_SecondsToLive;
 	float m_SecondsToWait;
 
-	// Public prototypes go here
 public:
 	Pickup(int type);
 

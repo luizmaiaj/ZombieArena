@@ -12,12 +12,17 @@ Player::Player()
 	m_MaxHealth = START_HEALTH;
 
 	// Associate a texture with the sprite
-	// !!Watch this space!!
 	m_Sprite = Sprite(TextureHolder::GetTexture("graphics/player.png"));
 
-	// Set the origin of the sprite to the centre, 
-	// for smooth rotation
-	m_Sprite.setOrigin(m_Sprite.getLocalBounds().width / 2, m_Sprite.getLocalBounds().height / 2);
+	// Set the origin of the sprite to the centre for smooth rotation
+	float fWidth_2 = m_Sprite.getLocalBounds().width / 2;
+	float fHeight_2 = m_Sprite.getLocalBounds().height / 2;
+	m_Sprite.setOrigin(fWidth_2, fHeight_2);
+
+	m_gapSize = (fWidth_2 > fHeight_2) ? fWidth_2 : fHeight_2;
+
+	// Remember how big the tiles are in this arena
+	m_gapSize = TILE_SIZE + m_gapSize;
 }
 
 void Player::resetPlayerStats()
@@ -29,25 +34,21 @@ void Player::resetPlayerStats()
 	m_MaxHealth = START_HEALTH;
 }
 
-void Player::spawn(IntRect arena, Vector2u resolution, int tileSize)
+void Player::spawn(IntRect arena, Vector2u resolution)
 {
 	// Place the player in the middle of the arena
 	m_Position.x = (float) arena.width / 2;
 	m_Position.y = (float) arena.height / 2;
 
 	// Copy the details of the arena to the player's m_Arena
-	m_Arena.left = arena.left;
-	m_Arena.width = arena.width;
-	m_Arena.top = arena.top;
-	m_Arena.height = arena.height;
-
-	// Remember how big the tiles are in this arena
-	m_TileSize = tileSize;
+	m_playerArena.left = arena.left + m_gapSize;
+	m_playerArena.width = arena.width - m_gapSize;
+	m_playerArena.top = arena.top + m_gapSize;
+	m_playerArena.height = arena.height - m_gapSize;
 
 	// Strore the resolution for future use
-	m_Resolution.x = resolution.x;
-	m_Resolution.y = resolution.y;
-
+	m_res_2.x = (float) resolution.x / 2;
+	m_res_2.y = (float) resolution.y / 2;
 }
 
 bool Player::isMoving()
@@ -149,7 +150,7 @@ uint Player::collisions(ZombieManager* apZombies)
 		{
 			Zombie* pZombie = &(apZombies->m_zombies[j]);
 
-			if( m_weapon.collisions(pZombie) );
+			if( m_weapon.collisions(pZombie) )
 			{
 				apZombies->kill();
 
@@ -204,15 +205,15 @@ void Player::updatePosition(float aDT, Vector2i mousePosition)
 	if (m_LeftPressed) m_Position.x -= m_Speed * aDT;
 
 	// Keep the player in the arena
-	if (m_Position.x > m_Arena.width - m_TileSize) m_Position.x = (float)m_Arena.width - m_TileSize;
-	if (m_Position.x < m_Arena.left + m_TileSize) m_Position.x = (float)m_Arena.left + m_TileSize;
-	if (m_Position.y > m_Arena.height - m_TileSize) m_Position.y = (float)m_Arena.height - m_TileSize;
-	if (m_Position.y < m_Arena.top + m_TileSize) m_Position.y = (float)m_Arena.top + m_TileSize;
+	if (m_Position.x > m_playerArena.width) m_Position.x = (float) m_playerArena.width;
+	if (m_Position.x < m_playerArena.left) m_Position.x = (float) m_playerArena.left;
+	if (m_Position.y > m_playerArena.height) m_Position.y = (float) m_playerArena.height;
+	if (m_Position.y < m_playerArena.top) m_Position.y = (float) m_playerArena.top;
 
 	m_Sprite.setPosition(m_Position);
 
 	// Calculate the angle the player is facing
-	float angle = (float)atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * M_180_PI;
+	float angle = atan2(mousePosition.y - m_res_2.y, mousePosition.x - m_res_2.x) * M_180_PI;
 
 	m_Sprite.setRotation(angle);
 }

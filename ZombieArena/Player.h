@@ -4,8 +4,12 @@
 #include "TextureHolder.h"
 #include "Weapon.h"
 #include "ZombieManager.h"
+#include "Pickup.h"
 
 using namespace sf;
+
+const float START_SPEED = 200;
+const int START_HEALTH = 100;
 
 class Player
 {
@@ -15,7 +19,7 @@ public:
 	// Call this at the end of every game
 	void resetPlayerStats();
 
-	void spawn(IntRect arena, Vector2u resolution, int tileSize);
+	void spawn(IntRect arena, Vector2u resolution);
 
 	bool isMoving();
 
@@ -66,9 +70,6 @@ public:
 private:
 	void updatePosition(float aDT, Vector2i mousePosition);
 
-	const float START_SPEED = 200;
-	const int START_HEALTH = 100;
-
 	// Where is the player
 	Vector2f m_Position;
 
@@ -80,13 +81,13 @@ private:
 	Texture m_Texture;
 
 	// What is the screen resolution
-	Vector2u m_Resolution;
+	Vector2f m_res_2;
 
 	// What size is the current arena
-	IntRect m_Arena;
+	FloatRect m_playerArena;
 
 	// How big is each tile of the arena
-	int m_TileSize{ 0 };
+	float m_gapSize{ 0.f };
 
 	// Which directions is the player currently moving in
 	bool m_UpPressed{ false };

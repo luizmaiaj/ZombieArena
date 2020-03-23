@@ -13,7 +13,7 @@ Weapon::Weapon()
 void Weapon::Reset()
 {
 	m_spareBullets = START_BULLETS;
-	m_bulletsInClip = CLIP_SIZE;
+	m_clipBullets = CLIP_SIZE;
 	m_clipSize = CLIP_SIZE;
 	m_fireRate = FIRE_RATE;
 }
@@ -28,20 +28,20 @@ bool Weapon::Reload()
 
 	if (dt < RELOAD_RATE) return bReloaded;
 
-	if (m_bulletsInClip < m_clipSize)
+	if (m_clipBullets < m_clipSize)
 	{
-		uint iToReload = m_clipSize - m_bulletsInClip;
+		uint iToReload = m_clipSize - m_clipBullets;
 
 		if (iToReload <=  m_spareBullets)
 		{
 			bReloaded = true;
-			m_bulletsInClip += iToReload;
+			m_clipBullets += iToReload;
 			m_spareBullets -= iToReload;
 		}
 		else
 		{
 			bReloaded = true;
-			m_bulletsInClip += m_spareBullets;
+			m_clipBullets += m_spareBullets;
 			m_spareBullets = 0;
 		}
 
@@ -69,7 +69,7 @@ bool Weapon::Shoot(float startX, float startY, float xTarget, float yTarget)
 
 	uint dt = (uint) m_time.asMilliseconds() - m_lastShot.asMilliseconds();
 
-	if ((dt > m_fireRate) && m_bulletsInClip)
+	if ((dt > m_fireRate) && m_clipBullets)
 	{
 		m_bullets[m_currentBullet].shoot(startX, startY, xTarget, yTarget);
 
@@ -78,7 +78,7 @@ bool Weapon::Shoot(float startX, float startY, float xTarget, float yTarget)
 
 		m_shoot->play();
 
-		m_bulletsInClip--;
+		m_clipBullets--;
 
 		return true;
 	}
@@ -112,7 +112,7 @@ uint Weapon::SpareBullets()
 
 uint Weapon::ClipBullets()
 {
-	return m_spareBullets;
+	return m_clipBullets;
 }
 
 uint Weapon::collisions(Zombie* apZombie)
@@ -137,7 +137,7 @@ uint Weapon::collisions(Zombie* apZombie)
 		}
 	}
 
-	return uint();
+	return score;
 }
 
 void Weapon::drawBullets(RenderWindow& window)

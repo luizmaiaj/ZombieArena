@@ -38,11 +38,10 @@ void Zombie::spawn(float startX, float startY, int type, int seed)
 		break;
 	}
 
-	// Modify the speed to make the zombie unique
-	// Every zombie is unique. Create a speed modifier
+	// Modify the speed to make the zombie unique Every zombie is unique. Create a speed modifier
 	srand((int)time(0) * seed);
 	// Somewhere between 80 an 100
-	float modifier = (float) (rand() % MAX_VARRIANCE) + OFFSET;
+	float modifier = (float) (rand() % MAX_VARIANCE) + OFFSET;
 	// Express as a fraction of 1
 	modifier /= 100; // Now equals between .7 and 1
 	m_Speed *= modifier;
@@ -58,7 +57,7 @@ bool Zombie::hit()
 {
 	m_Health--;
 
-	if (m_Health < 0)
+	if (m_Health <= 0)
 	{
 		// dead
 		m_Alive = false;
@@ -93,25 +92,10 @@ void Zombie::update(float elapsedTime, Vector2f playerLocation)
 	float playerY = playerLocation.y;
 
 	// Update the zombie position variables
-	if (playerX > m_Position.x)
-	{
-		m_Position.x = m_Position.x + m_Speed * elapsedTime;
-	}
-
-	if (playerY > m_Position.y)
-	{
-		m_Position.y = m_Position.y + m_Speed * elapsedTime;
-	}
-
-	if (playerX < m_Position.x)
-	{
-		m_Position.x = m_Position.x - m_Speed * elapsedTime;
-	}
-
-	if (playerY < m_Position.y)
-	{
-		m_Position.y = m_Position.y - m_Speed * elapsedTime;
-	}
+	if (playerX > m_Position.x) m_Position.x = m_Position.x + m_Speed * elapsedTime;
+	if (playerY > m_Position.y) m_Position.y = m_Position.y + m_Speed * elapsedTime;
+	if (playerX < m_Position.x) m_Position.x = m_Position.x - m_Speed * elapsedTime;
+	if (playerY < m_Position.y) m_Position.y = m_Position.y - m_Speed * elapsedTime;
 
 	// Move the sprite
 	m_Sprite.setPosition(m_Position);

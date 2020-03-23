@@ -1,5 +1,13 @@
 #include "ZombieManager.h"
 
+ZombieManager::ZombieManager()
+{
+	m_SM.pushback("sound/zombie_attack.wav");
+	m_SM.pushback("sound/zombie_short.wav");
+	m_SM.pushback("sound/zombie_short_low.wav");
+	m_SM.pushback("sound/zombie_slow.wav");
+}
+
 Zombie* ZombieManager::createHorde(int numZombies, IntRect arena)
 {
 	delete[] m_zombies; // Delete the previously allocated memory (if it exists)
@@ -8,10 +16,10 @@ Zombie* ZombieManager::createHorde(int numZombies, IntRect arena)
 
 	m_numZombiesAlive = m_numZombies = numZombies;
 
-	int maxY = arena.height - 20;
-	int minY = arena.top + 20;
-	int maxX = arena.width - 20;
-	int minX = arena.left + 20;
+	int maxY = arena.height - ZOMBIE_GAP;
+	int minY = arena.top + ZOMBIE_GAP;
+	int maxX = arena.width - ZOMBIE_GAP;
+	int minX = arena.left + ZOMBIE_GAP;
 
 	for (int i = 0; i < numZombies; i++)
 	{
@@ -64,6 +72,8 @@ void ZombieManager::update(float aDT, Vector2f playerPosition)
 		if (m_zombies[i].isAlive())
 			m_zombies[i].update(aDT, playerPosition);
 	}
+
+	m_SM.play(aDT);
 }
 
 uint ZombieManager::alive()

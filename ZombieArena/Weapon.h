@@ -30,7 +30,7 @@ public:
 
 private:
 	uint m_spareBullets{ START_BULLETS };
-	uint m_bulletsInClip{ CLIP_SIZE };
+	uint m_clipBullets{ CLIP_SIZE };
 	uint m_clipSize{ CLIP_SIZE };
 	uint m_fireRate{ FIRE_RATE };
 	LSound* m_shoot{ NULL };

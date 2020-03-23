@@ -14,8 +14,8 @@ const float CHASER_HEALTH = 1;
 const float CRAWLER_HEALTH = 3;
 
 // Make each zombie vary its speed slightly
-const int MAX_VARRIANCE = 30;
-const int OFFSET = 101 - MAX_VARRIANCE;
+const int MAX_VARIANCE = 30;
+const int OFFSET = 101 - MAX_VARIANCE;
 
 class Zombie
 {

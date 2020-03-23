@@ -118,12 +118,6 @@ int main()
 	LSound pickup("sound/pickup.wav"); // Prepare the pickup sound
 	LSound relief("sound/relief.wav"); // relief sound when getting extra health
 
-	SoundManager smZombie;
-	smZombie.pushback("sound/zombie_attack.wav");
-	smZombie.pushback("sound/zombie_short.wav");
-	smZombie.pushback("sound/zombie_short_low.wav");
-	smZombie.pushback("sound/zombie_slow.wav");
-
 	// The main game loop
 	while (window.isOpen())
 	{
@@ -208,9 +202,9 @@ int main()
 					arena.top = 0;
 
 					// Pass the vertex array by reference to the createBackground function
-					int tileSize = createBackground(background, arena);
+					createBackground(background, arena);
 
-					player.spawn(arena, resolution, tileSize); // Spawn the player in the middle of the arena
+					player.spawn(arena, resolution); // Spawn the player in the middle of the arena
 
 					// Configure the pick-ups
 					healthPickup.setArena(arena);
@@ -293,8 +287,6 @@ int main()
 			// Make a decimal fraction of 1 from the delta time
 			float dtAsSeconds = dt.asSeconds();
 
-			smZombie.play(dtAsSeconds);
-
 			// Where is the mouse pointer
 			mouseScreenPosition = Mouse::getPosition();
 
@@ -360,27 +352,27 @@ int main()
 				timeSinceLastUpdate = Time::Zero;
 
 				// Update the ammo text
-				ssAmmo.clear();
+				ssAmmo.str(std::string());
 				ssAmmo << player.m_weapon.ClipBullets() << "/" << player.m_weapon.SpareBullets();
 				ammoText.setString(ssAmmo.str());
 
 				// Update the score text
-				ssScore.clear();
+				ssScore.str(std::string());
 				ssScore << "Score:" << score;
 				scoreText.setString(ssScore.str());
 
 				// Update the high score text
-				ssHiScore.clear();
+				ssHiScore.str(std::string());
 				ssHiScore << "Hi Score:" << hiScore;
 				hiScoreText.setString(ssHiScore.str());
 
 				// Update the wave
-				ssWave.clear();
+				ssWave.str(std::string());
 				ssWave << "Wave:" << wave;
 				waveNumberText.setString(ssWave.str());
 
 				// Update the high score text
-				ssZombiesAlive.clear();
+				ssZombiesAlive.str(std::string());
 				ssZombiesAlive << "Zombies:" << Zombies.alive();
 				zombiesRemainingText.setString(ssZombiesAlive.str());
 			}// End HUD update

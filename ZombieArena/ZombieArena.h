@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Zombie.h"
-#include "SoundManager.h"
 #include "LText.h"
 #include "Player.h"
 #include "TextureHolder.h"
