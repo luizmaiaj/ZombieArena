@@ -2,60 +2,19 @@
 
 #include <SFML/Graphics.hpp>
 #include "TextureHolder.h"
+#include "Weapon.h"
 
 using namespace sf;
 
 class Player
 {
-private:
-	const float START_SPEED = 200;
-	const int START_HEALTH = 100;
-
-	// Where is the player
-	Vector2f m_Position;
-
-	// Of course we will need a sprite
-	Sprite m_Sprite;
-
-	// And a texture
-	// !!Watch this space!!
-	Texture m_Texture;
-
-	// What is the screen resolution
-	Vector2f m_Resolution;
-
-	// What size is the current arena
-	IntRect m_Arena;
-
-	// How big is each tile of the arena
-	int m_TileSize{ 0 };
-
-	// Which directions is the player currently moving in
-	bool m_UpPressed{ false };
-	bool m_DownPressed{ false };
-	bool m_LeftPressed{ false };
-	bool m_RightPressed{ false };
-
-	// How much health has the player got?
-	int m_Health{ START_HEALTH };
-	// What is the maximum health the player can have
-	int m_MaxHealth{ START_HEALTH };
-
-	// When was the player last hit
-	Time m_LastHit;
-
-	// Speed in pixels per second
-	float m_Speed{ START_SPEED };
-
-	// All our public functions will come next
 public:
-
 	Player();
 
 	// Call this at the end of every game
 	void resetPlayerStats();
 
-	void spawn(IntRect arena, Vector2f resolution, int tileSize);
+	void spawn(IntRect arena, Vector2u resolution, int tileSize);
 
 	bool isMoving();
 
@@ -96,5 +55,47 @@ public:
 
 	// Increase the maximum amount of health the player can have
 	void increaseHealthLevel(int amount);
+
+	Weapon m_weapon;
+
+private:
+	const float START_SPEED = 200;
+	const int START_HEALTH = 100;
+
+	// Where is the player
+	Vector2f m_Position;
+
+	// Of course we will need a sprite
+	Sprite m_Sprite;
+
+	// And a texture
+	// !!Watch this space!!
+	Texture m_Texture;
+
+	// What is the screen resolution
+	Vector2u m_Resolution;
+
+	// What size is the current arena
+	IntRect m_Arena;
+
+	// How big is each tile of the arena
+	int m_TileSize{ 0 };
+
+	// Which directions is the player currently moving in
+	bool m_UpPressed{ false };
+	bool m_DownPressed{ false };
+	bool m_LeftPressed{ false };
+	bool m_RightPressed{ false };
+
+	// How much health has the player got?
+	int m_Health{ START_HEALTH };
+	// What is the maximum health the player can have
+	int m_MaxHealth{ START_HEALTH };
+
+	// When was the player last hit
+	Time m_LastHit;
+
+	// Speed in pixels per second
+	float m_Speed{ START_SPEED };
 };
 

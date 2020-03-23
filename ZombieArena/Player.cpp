@@ -1,3 +1,7 @@
+#define _USE_MATH_DEFINES
+#include <cmath>
+const float M_180_PI = 180.f / (float)M_PI; 
+
 #include "Player.h"
 #include "TextureHolder.h"
 
@@ -18,12 +22,14 @@ Player::Player()
 
 void Player::resetPlayerStats()
 {
+	m_weapon.Reset();
+
 	m_Speed = START_SPEED;
 	m_Health = START_HEALTH;
 	m_MaxHealth = START_HEALTH;
 }
 
-void Player::spawn(IntRect arena, Vector2f resolution, int tileSize)
+void Player::spawn(IntRect arena, Vector2u resolution, int tileSize)
 {
 	// Place the player in the middle of the arena
 	m_Position.x = (float) arena.width / 2;
@@ -172,7 +178,7 @@ void Player::update(float elapsedTime, Vector2i mousePosition)
 	}
 
 	// Calculate the angle the player is facing
-	float angle = (atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * 180.f) / 3.141f;
+	float angle = (float) atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * M_180_PI;
 
 	m_Sprite.setRotation(angle);
 }

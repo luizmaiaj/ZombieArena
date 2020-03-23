@@ -5,10 +5,6 @@
 #include <sstream>
 #include <fstream>
 #include "ZombieArena.h"
-#include "Player.h"
-#include "TextureHolder.h"
-#include "Bullet.h"
-#include "Pickup.h"
 
 int main()
 {
@@ -16,56 +12,53 @@ int main()
 	TextureHolder holder;
 
 	Joystick js;
-	unsigned int uijsButtons = 0;
+	uint uijsButtons = 0;
 
-	// The game will always be in one of four states
-	enum class State { PAUSED, LEVELING_UP, GAME_OVER, PLAYING };
 	// Start with the GAME_OVER state
 	State state = State::GAME_OVER;
 
 	// Get the screen resolution and create an SFML window
-	Vector2f resolution;
-	resolution.x = (float) VideoMode::getDesktopMode().width;
-	resolution.y = (float) VideoMode::getDesktopMode().height;
+	Vector2u resolution;
+	resolution.x = VideoMode::getDesktopMode().width;
+	resolution.y = VideoMode::getDesktopMode().height;
 
-	RenderWindow window(VideoMode((unsigned int) resolution.x, (unsigned int) resolution.y), "Zombie Arena", Style::Default);
+	RenderWindow window(VideoMode(resolution.x, resolution.y), "Zombie Arena", Style::Default);
 
 	// Create a an SFML View for the main action
-	View mainView(sf::FloatRect(0, 0, resolution.x, resolution.y));
+	View mainView(sf::FloatRect(0, 0, (float) resolution.x, (float) resolution.y));
 
-	// Here is our clock for timing everything
-	Clock clock;
-	// How long has the PLAYING state been active
-	Time gameTimeTotal;
+	Clock clock; // Here is our clock for timing everything
+	Time gameTimeTotal; // How long has the PLAYING state been active
 
-	// Where is the mouse in relation to world coordinates
-	Vector2f mouseWorldPosition;
-	// Where is the mouse in relation to screen coordinates
-	Vector2i mouseScreenPosition;
+	Vector2f mouseWorldPosition; // Where is the mouse in relation to world coordinates
+	Vector2i mouseScreenPosition; // Where is the mouse in relation to screen coordinates
 
-	// Create an instance of the Player class
-	Player player;
+	Player player; // Create an instance of the Player class
 
-	// The boundaries of the arena
-	IntRect arena;
+	IntRect arena; // The boundaries of the arena
 
-	// Create the background
-	VertexArray background;
-	// Load the texture for our background vertex array
-	Texture textureBackground = TextureHolder::GetTexture("graphics/background_sheet.png");
+	VertexArray background; // Create the background
+	Texture textureBackground = TextureHolder::GetTexture("graphics/background_sheet.png"); // Load the texture for our background vertex array
 
 	// Prepare for a horde of zombies
-	int numZombies;
-	int numZombiesAlive;
+	uint numZombies = 0, numZombiesAlive = 0;
 	Zombie* zombies = NULL;
 
 	// 100 bullets should do
-	Bullet bullets[100];
+	Bullet bullets[BULLET_SPRITES];
 	int currentBullet = 0;
-	int bulletsSpare = 24;
-	int bulletsInClip = 6;
-	int clipSize = 6;
+	int bulletsSpare = START_BULLETS;
+	int bulletsInClip = CLIP_SIZE;
+	int clipSize = CLIP_SIZE;
 	float fireRate = 1;
+
+	// Update game HUD text
+	stringstream ssAmmo;
+	stringstream ssScore;
+	stringstream ssHiScore;
+	stringstream ssWave;
+	stringstream ssZombiesAlive;
+
 	// When was the fire button last pressed?
 	Time leftLastPressed;
 	Time rightLastPressed;
@@ -82,8 +75,7 @@ int main()
 	Pickup ammoPickup(2);
 
 	// About the game
-	int score = 0;
-	int hiScore = 0;
+	int score = 0, hiScore = 0;
 
 	// For the home/game over screen
 	Sprite spriteGameOver;
@@ -92,7 +84,7 @@ int main()
 	spriteGameOver.setPosition(0, 0);
 
 	// Create a view for the HUD
-	View hudView(sf::FloatRect(0, 0, resolution.x, resolution.y));
+	View hudView(sf::FloatRect(0.f, 0.f, (float) resolution.x, (float) resolution.y));
 
 	// Create a sprite for the ammo icon
 	Sprite spriteAmmoIcon;
@@ -134,15 +126,10 @@ int main()
 	int framesSinceLastHUDUpdate = 0;
 	// What time was the last update
 	Time timeSinceLastUpdate;
-	// How often (in frames) should we update the HUD
-	int fpsMeasurementFrameInterval = 100;
 
 	LSound hit("sound/hit.wav"); // hit sound
 	LSound footsteps("sound/footsteps.wav"); // footsteps sound
 	LSound splat("sound/splat.wav"); // Prepare the splat sound
-	LSound shoot("sound/shoot.wav"); // Prepare the shoot sound
-	LSound reload("sound/reload.wav"); // Prepare the reload sound
-	LSound reloadFailed("sound/reload_failed.wav"); // Prepare the failed sound
 	LSound powerup("sound/powerup.wav"); // Prepare the powerup sound
 	LSound pickup("sound/pickup.wav"); // Prepare the pickup sound
 	LSound relief("sound/relief.wav"); // relief sound when getting extra health
@@ -156,14 +143,13 @@ int main()
 	// The main game loop
 	while (window.isOpen())
 	{
-		// Update the delta time
-		Time dt = clock.restart();
-		// Update the total game time
-		gameTimeTotal += dt;
+		if (Keyboard::isKeyPressed(Keyboard::Escape)) window.close(); // Handle the player quitting
 
-		// Handle events
+		Time dt = clock.restart(); // Update the delta time
+		gameTimeTotal += dt; // Update the total game time
+
 		Event event;
-		while (window.pollEvent(event))
+		while (window.pollEvent(event)) // Handle events
 		{
 			if (state == State::PAUSED)
 			{
@@ -189,13 +175,6 @@ int main()
 						wave = 0;
 						score = 0;
 
-						// Prepare the gun and ammo for next game
-						currentBullet = 0;
-						bulletsSpare = 24;
-						bulletsInClip = 6;
-						clipSize = 6;
-						fireRate = 1;
-
 						player.resetPlayerStats(); // Reset the player's stats
 					}
 					break;
@@ -212,7 +191,7 @@ int main()
 						state = State::PLAYING;
 						break;
 					case Keyboard::Num2:
-						clipSize += clipSize;
+						clipSize += CLIP_SIZE;
 						state = State::PLAYING;
 						break;
 					case Keyboard::Num3:
@@ -282,51 +261,22 @@ int main()
 					break;
 				case Event::MouseButtonPressed:
 				case Event::MouseButtonReleased:
-					if (Mouse::isButtonPressed(sf::Mouse::Left)) // Fire a bullet
+					if (Mouse::isButtonPressed(sf::Mouse::Left) && (gameTimeTotal.asMilliseconds() - leftLastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)) // Fire a bullet
 					{
-						if (gameTimeTotal.asMilliseconds() - leftLastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)
-						{
-							bullets[currentBullet].shoot(player.getCenter().x, player.getCenter().y, mouseWorldPosition.x, mouseWorldPosition.y);
+						bullets[currentBullet].shoot(player.getCenter().x, player.getCenter().y, mouseWorldPosition.x, mouseWorldPosition.y);
 
-							currentBullet++;
-							if (currentBullet > 99) currentBullet = 0;
+						currentBullet++;
+						if (currentBullet > (BULLET_SPRITES - 1)) currentBullet = 0;
 
-							leftLastPressed = gameTimeTotal;
-							shoot.play();
-							bulletsInClip--;
-						}
+						leftLastPressed = gameTimeTotal;
+
+						player.m_weapon.Shoot();
 					}
-					else if (Mouse::isButtonPressed(sf::Mouse::Right))
+					else if (Mouse::isButtonPressed(sf::Mouse::Right) && (gameTimeTotal.asMilliseconds() - rightLastPressed.asMilliseconds() > 1000))
 					{
-						if (gameTimeTotal.asMilliseconds() - rightLastPressed.asMilliseconds() > 1000)
-						{
-							if (bulletsInClip < clipSize)
-							{
-								bool bReloaded = false;
-								int iToReload = clipSize - bulletsInClip;
+						player.m_weapon.Reload();
 
-								if (iToReload <= bulletsSpare)
-								{
-									bReloaded = true;
-									bulletsInClip += iToReload;
-									bulletsSpare -= iToReload;
-								}
-								else
-								{
-									bReloaded = true;
-									bulletsInClip += bulletsSpare;
-									bulletsSpare = 0;
-								}
-
-								if (bReloaded)
-								{
-									rightLastPressed = gameTimeTotal;
-									reload.play();
-								}
-							}
-						}
-						else
-							reloadFailed.play();
+						rightLastPressed = gameTimeTotal;
 					}
 					break;
 				case Event::JoystickConnected:
@@ -347,7 +297,7 @@ int main()
 					}
 					break;
 				case Event::JoystickButtonPressed:
-					for (unsigned int jsb = 0; jsb < uijsButtons; jsb++)
+					for (uint jsb = 0; jsb < uijsButtons; jsb++)
 					{
 						if (js.isButtonPressed(0, jsb))
 							cout << "button: " << jsb << "\n";
@@ -356,9 +306,6 @@ int main()
 				}
 			}
 		}// End event polling
-
-		 // Handle the player quitting
-		if (Keyboard::isKeyPressed(Keyboard::Escape)) window.close();
 
 		if (player.isMoving())
 		{
@@ -396,13 +343,13 @@ int main()
 			mainView.setCenter(player.getCenter());
 
 			// Loop through each Zombie and update them
-			for (int i = 0; i < numZombies; i++)
+			for (uint i = 0; i < numZombies; i++)
 			{
 				if (zombies[i].isAlive()) zombies[i].update(dt.asSeconds(), playerPosition);
 			}
 
 			// Update any bullets that are in-flight
-			for (int i = 0; i < 100; i++)
+			for (int i = 0; i < BULLET_SPRITES; i++)
 			{
 				if (bullets[i].isInFlight()) bullets[i].update(dtAsSeconds);
 			}
@@ -411,47 +358,35 @@ int main()
 			healthPickup.update(dtAsSeconds);
 			ammoPickup.update(dtAsSeconds);
 
-			// Collision detection
-			// Have any zombies been shot?
-			for (int i = 0; i < 100; i++)
+			// Collision detection: have any zombies been shot?
+			for (uint i = 0; i < BULLET_SPRITES; i++)
 			{
-				for (int j = 0; j < numZombies; j++)
+				for (uint j = 0; j < numZombies; j++)
 				{
 					if (bullets[i].isInFlight() && zombies[j].isAlive())
 					{
 						if (bullets[i].getPosition().intersects(zombies[j].getPosition()))
 						{
-							// Stop the bullet
-							bullets[i].stop();
-
-							// Register the hit and see if it was a kill
-							if (zombies[j].hit())
+							bullets[i].stop(); // Stop the bullet
+							
+							if (zombies[j].hit()) // Register the hit and see if it was a kill
 							{
-								// Not just a hit but a kill too
-								score += 10;
-								if (score >= hiScore)
-								{
-									hiScore = score;
-								}
+								score += 10; // Not just a hit but a kill too
+								if (score >= hiScore) hiScore = score;
 
 								numZombiesAlive--;
 
-								// When all the zombies are dead (again)
-								if (numZombiesAlive == 0)
-								{
-									state = State::LEVELING_UP;
-								}
+								if (numZombiesAlive == 0) state = State::LEVELING_UP; // when all zombies die
 							}
-
-							// Make a splat sound
-							splat.play();
+							
+							splat.play(); // Make a splat sound
 						}
 					}
 				}
 			}// End zombie being shot
 
 			// Have any zombies touched the player			
-			for (int i = 0; i < numZombies; i++)
+			for (uint i = 0; i < numZombies; i++)
 			{
 				if (player.getPosition().intersects(zombies[i].getPosition()) && zombies[i].isAlive())
 				{
@@ -470,18 +405,15 @@ int main()
 				}
 			}// End player touched
 
-			// Has the player touched health pickup
-			if (player.getPosition().intersects(healthPickup.getPosition()) && healthPickup.isSpawned())
+			if (player.getPosition().intersects(healthPickup.getPosition()) && healthPickup.isSpawned()) // Has the player touched health pickup
 			{
 				player.increaseHealthLevel(healthPickup.gotIt());
 				relief.play(); // Play a sound
 			}
 
-			// Has the player touched ammo pickup
-			if (player.getPosition().intersects(ammoPickup.getPosition()) && ammoPickup.isSpawned())
+			if (player.getPosition().intersects(ammoPickup.getPosition()) && ammoPickup.isSpawned()) // Has the player touched ammo pickup
 			{
-				bulletsSpare += ammoPickup.gotIt();
-				reload.play(); // Play a sound
+				player.m_weapon.AddClip(ammoPickup.gotIt());
 			}
 
 			healthBar.setSize(Vector2f((float) player.getHealth() * 3, 70.f)); // size up the health bar
@@ -490,37 +422,35 @@ int main()
 			framesSinceLastHUDUpdate++; // Increment the number of frames since the last HUD calculation
 
 			// Calculate FPS every fpsMeasurementFrameInterval frames
-			if (framesSinceLastHUDUpdate > fpsMeasurementFrameInterval)
+			if (framesSinceLastHUDUpdate > UPDATE_HUD_INTERVAL)
 			{
-				// Update game HUD text
-				stringstream ssAmmo;
-				stringstream ssScore;
-				stringstream ssHiScore;
-				stringstream ssWave;
-				stringstream ssZombiesAlive;
+				framesSinceLastHUDUpdate = 0;
+				timeSinceLastUpdate = Time::Zero;
 
 				// Update the ammo text
+				ssAmmo.clear();
 				ssAmmo << bulletsInClip << "/" << bulletsSpare;
 				ammoText.setString(ssAmmo.str());
 
 				// Update the score text
+				ssScore.clear();
 				ssScore << "Score:" << score;
 				scoreText.setString(ssScore.str());
 
 				// Update the high score text
+				ssHiScore.clear();
 				ssHiScore << "Hi Score:" << hiScore;
 				hiScoreText.setString(ssHiScore.str());
 
 				// Update the wave
+				ssWave.clear();
 				ssWave << "Wave:" << wave;
 				waveNumberText.setString(ssWave.str());
 
 				// Update the high score text
+				ssZombiesAlive.clear();
 				ssZombiesAlive << "Zombies:" << numZombiesAlive;
 				zombiesRemainingText.setString(ssZombiesAlive.str());
-
-				framesSinceLastHUDUpdate = 0;
-				timeSinceLastUpdate = Time::Zero;
 			}// End HUD update
 		}// End updating the scene
 
@@ -536,9 +466,9 @@ int main()
 			window.draw(background, &textureBackground);
 
 			// Draw the zombies
-			for (int i = 0; i < numZombies; i++) window.draw(zombies[i].getSprite());
+			for (uint i = 0; i < numZombies; i++) window.draw(zombies[i].getSprite());
 
-			for (int i = 0; i < 100; i++)
+			for (uint i = 0; i < BULLET_SPRITES; i++)
 			{
 				if (bullets[i].isInFlight()) window.draw(bullets[i].getShape());
 			}
@@ -573,10 +503,7 @@ int main()
 			window.draw(levelUpText);
 		}
 
-		if (state == State::PAUSED)
-		{
-			window.draw(pausedText);
-		}
+		if (state == State::PAUSED) window.draw(pausedText);
 
 		if (state == State::GAME_OVER)
 		{

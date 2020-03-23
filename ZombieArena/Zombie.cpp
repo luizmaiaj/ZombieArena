@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #include <cmath>
+const float M_180_PI = 180.f / (float)M_PI;
 
 #include "Zombie.h"
 #include "TextureHolder.h"
@@ -7,8 +8,6 @@
 #include <ctime>
 
 using namespace std;
-
-const float M_180_PI = 180.f / (float) M_PI;
 
 void Zombie::spawn(float startX, float startY, int type, int seed)
 {
