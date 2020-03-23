@@ -11,7 +11,7 @@ class ZombieManager
 {
 public:
 	ZombieManager();
-	Zombie* createHorde(int numZombies, IntRect arena);
+	void createHorde(int numZombies, IntRect arena);
 	void update(float aDT, Vector2f playerPosition);
 	uint alive();
 	void kill();

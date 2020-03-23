@@ -8,7 +8,7 @@ ZombieManager::ZombieManager()
 	m_SM.pushback("sound/zombie_slow.wav");
 }
 
-Zombie* ZombieManager::createHorde(int numZombies, IntRect arena)
+void ZombieManager::createHorde(int numZombies, IntRect arena)
 {
 	delete[] m_zombies; // Delete the previously allocated memory (if it exists)
 
@@ -62,7 +62,6 @@ Zombie* ZombieManager::createHorde(int numZombies, IntRect arena)
 		// Spawn the new zombie into the array
 		m_zombies[i].spawn(x, y, type, i);
 	}
-	return m_zombies;
 }
 
 void ZombieManager::update(float aDT, Vector2f playerPosition)

@@ -6,7 +6,7 @@
 
 typedef unsigned int uint;
 
-constexpr uint CLIP_SIZE = 6; //
+constexpr uint CLIP_SIZE = 6;
 constexpr uint START_BULLETS = 24;
 constexpr uint BULLET_SPRITES = 100;
 constexpr uint FIRE_RATE = 1000;
