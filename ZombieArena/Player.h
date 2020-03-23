@@ -3,6 +3,7 @@
 #include <SFML/Graphics.hpp>
 #include "TextureHolder.h"
 #include "Weapon.h"
+#include "ZombieManager.h"
 
 using namespace sf;
 
@@ -45,7 +46,11 @@ public:
 	void moveY(float aY);
 
 	// We will call this function once every frame
-	void update(float elapsedTime, Vector2i mousePosition);
+	void update(float aDT, Vector2i mousePosition);
+
+	uint collisions(ZombieManager* apZombies);
+
+	bool shoot(float xTarget, float yTarget);
 
 	// Give player a speed boost
 	void upgradeSpeed();
@@ -59,6 +64,8 @@ public:
 	Weapon m_weapon;
 
 private:
+	void updatePosition(float aDT, Vector2i mousePosition);
+
 	const float START_SPEED = 200;
 	const int START_HEALTH = 100;
 

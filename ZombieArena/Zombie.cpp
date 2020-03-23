@@ -11,7 +11,6 @@ using namespace std;
 
 void Zombie::spawn(float startX, float startY, int type, int seed)
 {
-
 	switch (type)
 	{
 	case 0:

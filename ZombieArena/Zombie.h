@@ -3,23 +3,23 @@
 
 using namespace sf;
 
+// How fast is each zombie type?
+const float BLOATER_SPEED = 40;
+const float CHASER_SPEED = 80;
+const float CRAWLER_SPEED = 20;
+
+// How tough is each zombie type
+const float BLOATER_HEALTH = 5;
+const float CHASER_HEALTH = 1;
+const float CRAWLER_HEALTH = 3;
+
+// Make each zombie vary its speed slightly
+const int MAX_VARRIANCE = 30;
+const int OFFSET = 101 - MAX_VARRIANCE;
+
 class Zombie
 {
 private:
-	// How fast is each zombie type?
-	const float BLOATER_SPEED = 40;
-	const float CHASER_SPEED = 80;
-	const float CRAWLER_SPEED = 20;
-
-	// How tough is each zombie type
-	const float BLOATER_HEALTH = 5;
-	const float CHASER_HEALTH = 1;
-	const float CRAWLER_HEALTH = 3;
-
-	// Make each zombie vary its speed slightly
-	const int MAX_VARRIANCE = 30;
-	const int OFFSET = 101 - MAX_VARRIANCE;
-
 	// Where is this zombie?
 	Vector2f m_Position;
 

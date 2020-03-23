@@ -131,56 +131,44 @@ void Player::moveY(float aY)
 	m_DownPressed = aY < 0;
 }
 
-void Player::update(float elapsedTime, Vector2i mousePosition)
+void Player::update(float aDT, Vector2i mousePosition)
 {
+	updatePosition(aDT, mousePosition);
 
-	if (m_UpPressed)
+	m_weapon.update(aDT);
+}
+
+uint Player::collisions(ZombieManager* apZombies)
+{
+	uint score = 0;
+
+	// Collision detection: have any zombies been shot?
+	for (uint j = 0; j < apZombies->count(); j++)
 	{
-		m_Position.y -= m_Speed * elapsedTime;
+		if (apZombies->m_zombies[j].isAlive())
+		{
+			Zombie* pZombie = &(apZombies->m_zombies[j]);
+
+			if( m_weapon.collisions(pZombie) );
+			{
+				apZombies->kill();
+
+				score += 10;
+			}
+
+			if (getPosition().intersects(apZombies->m_zombies[j].getPosition()))
+			{
+				//if (hit(gameTimeTotal)) hit.play();
+			}
+		}
 	}
 
-	if (m_DownPressed)
-	{
-		m_Position.y += m_Speed * elapsedTime;
-	}
+	return score;
+}
 
-	if (m_RightPressed)
-	{
-		m_Position.x += m_Speed * elapsedTime;
-	}
-
-	if (m_LeftPressed)
-	{
-		m_Position.x -= m_Speed * elapsedTime;
-	}
-
-	m_Sprite.setPosition(m_Position);
-
-	// Keep the player in the arena
-	if (m_Position.x > m_Arena.width - m_TileSize)
-	{
-		m_Position.x = (float) m_Arena.width - m_TileSize;
-	}
-
-	if (m_Position.x < m_Arena.left + m_TileSize)
-	{
-		m_Position.x = (float) m_Arena.left + m_TileSize;
-	}
-
-	if (m_Position.y > m_Arena.height - m_TileSize)
-	{
-		m_Position.y = (float) m_Arena.height - m_TileSize;
-	}
-
-	if (m_Position.y < m_Arena.top + m_TileSize)
-	{
-		m_Position.y = (float) m_Arena.top + m_TileSize;
-	}
-
-	// Calculate the angle the player is facing
-	float angle = (float) atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * M_180_PI;
-
-	m_Sprite.setRotation(angle);
+bool Player::shoot(float xTarget, float yTarget)
+{
+	return m_weapon.Shoot(getCenter().x, getCenter().y, xTarget, yTarget);
 }
 
 void Player::upgradeSpeed()
@@ -205,4 +193,26 @@ void Player::increaseHealthLevel(int amount)
 	{
 		m_Health = m_MaxHealth;
 	}
+}
+
+void Player::updatePosition(float aDT, Vector2i mousePosition)
+{
+	// update position
+	if (m_UpPressed) m_Position.y -= m_Speed * aDT;
+	if (m_DownPressed) m_Position.y += m_Speed * aDT;
+	if (m_RightPressed) m_Position.x += m_Speed * aDT;
+	if (m_LeftPressed) m_Position.x -= m_Speed * aDT;
+
+	// Keep the player in the arena
+	if (m_Position.x > m_Arena.width - m_TileSize) m_Position.x = (float)m_Arena.width - m_TileSize;
+	if (m_Position.x < m_Arena.left + m_TileSize) m_Position.x = (float)m_Arena.left + m_TileSize;
+	if (m_Position.y > m_Arena.height - m_TileSize) m_Position.y = (float)m_Arena.height - m_TileSize;
+	if (m_Position.y < m_Arena.top + m_TileSize) m_Position.y = (float)m_Arena.top + m_TileSize;
+
+	m_Sprite.setPosition(m_Position);
+
+	// Calculate the angle the player is facing
+	float angle = (float)atan2(mousePosition.y - m_Resolution.y / 2, mousePosition.x - m_Resolution.x / 2) * M_180_PI;
+
+	m_Sprite.setRotation(angle);
 }

@@ -34,23 +34,12 @@ int main()
 	Vector2i mouseScreenPosition; // Where is the mouse in relation to screen coordinates
 
 	Player player; // Create an instance of the Player class
+	ZombieManager Zombies;
 
 	IntRect arena; // The boundaries of the arena
 
 	VertexArray background; // Create the background
 	Texture textureBackground = TextureHolder::GetTexture("graphics/background_sheet.png"); // Load the texture for our background vertex array
-
-	// Prepare for a horde of zombies
-	uint numZombies = 0, numZombiesAlive = 0;
-	Zombie* zombies = NULL;
-
-	// 100 bullets should do
-	Bullet bullets[BULLET_SPRITES];
-	int currentBullet = 0;
-	int bulletsSpare = START_BULLETS;
-	int bulletsInClip = CLIP_SIZE;
-	int clipSize = CLIP_SIZE;
-	float fireRate = 1;
 
 	// Update game HUD text
 	stringstream ssAmmo;
@@ -58,10 +47,6 @@ int main()
 	stringstream ssHiScore;
 	stringstream ssWave;
 	stringstream ssZombiesAlive;
-
-	// When was the fire button last pressed?
-	Time leftLastPressed;
-	Time rightLastPressed;
 
 	// Hide the mouse pointer and replace it with crosshair
 	window.setMouseCursorVisible(true);
@@ -129,7 +114,6 @@ int main()
 
 	LSound hit("sound/hit.wav"); // hit sound
 	LSound footsteps("sound/footsteps.wav"); // footsteps sound
-	LSound splat("sound/splat.wav"); // Prepare the splat sound
 	LSound powerup("sound/powerup.wav"); // Prepare the powerup sound
 	LSound pickup("sound/pickup.wav"); // Prepare the pickup sound
 	LSound relief("sound/relief.wav"); // relief sound when getting extra health
@@ -187,11 +171,11 @@ int main()
 					switch (event.key.code) // Handle the player levelling up
 					{
 					case Keyboard::Num1:
-						fireRate++;
+						player.m_weapon.IncreaseFireRate();
 						state = State::PLAYING;
 						break;
 					case Keyboard::Num2:
-						clipSize += CLIP_SIZE;
+						player.m_weapon.IncreaseClipSize();
 						state = State::PLAYING;
 						break;
 					case Keyboard::Num3:
@@ -232,12 +216,8 @@ int main()
 					healthPickup.setArena(arena);
 					ammoPickup.setArena(arena);
 
-					numZombies = 5 * wave; // Create a horde of zombies
-
-					delete[] zombies; // Delete the previously allocated memory (if it exists)
-					zombies = createHorde(numZombies, arena);
-					numZombiesAlive = numZombies;
-
+					Zombies.createHorde(5 * wave, arena);
+					
 					powerup.play(); // Play the powerup sound
 
 					clock.restart(); // Reset the clock so there isn't a frame jump
@@ -261,22 +241,13 @@ int main()
 					break;
 				case Event::MouseButtonPressed:
 				case Event::MouseButtonReleased:
-					if (Mouse::isButtonPressed(sf::Mouse::Left) && (gameTimeTotal.asMilliseconds() - leftLastPressed.asMilliseconds() > 1000 / fireRate && bulletsInClip > 0)) // Fire a bullet
+					if (Mouse::isButtonPressed(sf::Mouse::Left)) // Fire a bullet
 					{
-						bullets[currentBullet].shoot(player.getCenter().x, player.getCenter().y, mouseWorldPosition.x, mouseWorldPosition.y);
-
-						currentBullet++;
-						if (currentBullet > (BULLET_SPRITES - 1)) currentBullet = 0;
-
-						leftLastPressed = gameTimeTotal;
-
-						player.m_weapon.Shoot();
+						player.shoot(mouseWorldPosition.x, mouseWorldPosition.y);
 					}
-					else if (Mouse::isButtonPressed(sf::Mouse::Right) && (gameTimeTotal.asMilliseconds() - rightLastPressed.asMilliseconds() > 1000))
+					else if (Mouse::isButtonPressed(sf::Mouse::Right))
 					{
 						player.m_weapon.Reload();
-
-						rightLastPressed = gameTimeTotal;
 					}
 					break;
 				case Event::JoystickConnected:
@@ -339,71 +310,32 @@ int main()
 			// Make a note of the players new position
 			Vector2f playerPosition(player.getCenter());
 
+			// Loop through each Zombie and update them
+			Zombies.update(dtAsSeconds, playerPosition);
+
 			// Make the view centre around the player				
 			mainView.setCenter(player.getCenter());
-
-			// Loop through each Zombie and update them
-			for (uint i = 0; i < numZombies; i++)
-			{
-				if (zombies[i].isAlive()) zombies[i].update(dt.asSeconds(), playerPosition);
-			}
-
-			// Update any bullets that are in-flight
-			for (int i = 0; i < BULLET_SPRITES; i++)
-			{
-				if (bullets[i].isInFlight()) bullets[i].update(dtAsSeconds);
-			}
 
 			// Update the pickups
 			healthPickup.update(dtAsSeconds);
 			ammoPickup.update(dtAsSeconds);
 
-			// Collision detection: have any zombies been shot?
-			for (uint i = 0; i < BULLET_SPRITES; i++)
+			score += player.collisions(&Zombies);
+
+			if (score >= hiScore) hiScore = score;
+
+			if (player.getHealth() <= 0)
 			{
-				for (uint j = 0; j < numZombies; j++)
-				{
-					if (bullets[i].isInFlight() && zombies[j].isAlive())
-					{
-						if (bullets[i].getPosition().intersects(zombies[j].getPosition()))
-						{
-							bullets[i].stop(); // Stop the bullet
-							
-							if (zombies[j].hit()) // Register the hit and see if it was a kill
-							{
-								score += 10; // Not just a hit but a kill too
-								if (score >= hiScore) hiScore = score;
+				state = State::GAME_OVER;
 
-								numZombiesAlive--;
+				std::ofstream outputFile("gamedata/scores.txt");
+				outputFile << hiScore;
+				outputFile.close();
 
-								if (numZombiesAlive == 0) state = State::LEVELING_UP; // when all zombies die
-							}
-							
-							splat.play(); // Make a splat sound
-						}
-					}
-				}
-			}// End zombie being shot
+				footsteps.stop();
+			}
 
-			// Have any zombies touched the player			
-			for (uint i = 0; i < numZombies; i++)
-			{
-				if (player.getPosition().intersects(zombies[i].getPosition()) && zombies[i].isAlive())
-				{
-					//if (player.hit(gameTimeTotal)) hit.play();
-
-					if (player.getHealth() <= 0)
-					{
-						state = State::GAME_OVER;
-
-						std::ofstream outputFile("gamedata/scores.txt");
-						outputFile << hiScore;
-						outputFile.close();
-
-						footsteps.stop();
-					}
-				}
-			}// End player touched
+			if (!Zombies.alive()) state = State::LEVELING_UP; // when all zombies die
 
 			if (player.getPosition().intersects(healthPickup.getPosition()) && healthPickup.isSpawned()) // Has the player touched health pickup
 			{
@@ -429,7 +361,7 @@ int main()
 
 				// Update the ammo text
 				ssAmmo.clear();
-				ssAmmo << bulletsInClip << "/" << bulletsSpare;
+				ssAmmo << player.m_weapon.ClipBullets() << "/" << player.m_weapon.SpareBullets();
 				ammoText.setString(ssAmmo.str());
 
 				// Update the score text
@@ -449,7 +381,7 @@ int main()
 
 				// Update the high score text
 				ssZombiesAlive.clear();
-				ssZombiesAlive << "Zombies:" << numZombiesAlive;
+				ssZombiesAlive << "Zombies:" << Zombies.alive();
 				zombiesRemainingText.setString(ssZombiesAlive.str());
 			}// End HUD update
 		}// End updating the scene
@@ -466,12 +398,9 @@ int main()
 			window.draw(background, &textureBackground);
 
 			// Draw the zombies
-			for (uint i = 0; i < numZombies; i++) window.draw(zombies[i].getSprite());
+			for (uint i = 0; i < Zombies.count(); i++) window.draw(Zombies.m_zombies[i].getSprite());
 
-			for (uint i = 0; i < BULLET_SPRITES; i++)
-			{
-				if (bullets[i].isInFlight()) window.draw(bullets[i].getShape());
-			}
+			player.m_weapon.drawBullets(window);
 
 			// Draw the player
 			window.draw(player.getSprite());
@@ -577,57 +506,4 @@ int createBackground(VertexArray& rVA, IntRect arena)
 	}
 
 	return TILE_SIZE;
-}
-
-Zombie* createHorde(int numZombies, IntRect arena)
-{
-	Zombie* zombies = new Zombie[numZombies];
-
-	int maxY = arena.height - 20;
-	int minY = arena.top + 20;
-	int maxX = arena.width - 20;
-	int minX = arena.left + 20;
-
-	for (int i = 0; i < numZombies; i++)
-	{
-		// Which side should the zombie spawn
-		srand((int)time(0) * i);
-		int side = (rand() % 4);
-		float x = 0.f, y = 0.f;
-
-		switch (side)
-		{
-		case 0:
-			// left
-			x = (float) minX;
-			y = (float) (rand() % maxY) + minY;
-			break;
-
-		case 1:
-			// right
-			x = (float) maxX;
-			y = (float) (rand() % maxY) + minY;
-			break;
-
-		case 2:
-			// top
-			x = (float) (rand() % maxX) + minX;
-			y = (float) minY;
-			break;
-
-		case 3:
-			// bottom
-			x = (float) (rand() % maxX) + minX;
-			y = (float) maxY;
-			break;
-		}
-
-		// Bloater, crawler or runner
-		srand((int)time(0) * i * 2);
-		int type = (rand() % 3);
-
-		// Spawn the new zombie into the array
-		zombies[i].spawn(x, y, type, i);
-	}
-	return zombies;
 }

@@ -162,6 +162,7 @@
     <ClCompile Include="Zombie.cpp" />
     <ClCompile Include="ZombieArena.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="ZombieManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Bullet.h" />
@@ -174,6 +175,7 @@
     <ClInclude Include="Weapon.h" />
     <ClInclude Include="Zombie.h" />
     <ClInclude Include="ZombieArena.h" />
+    <ClInclude Include="ZombieManager.h" />
   </ItemGroup>
   <ItemGroup>
     <Font Include="fonts\zombiecontrol.ttf" />
