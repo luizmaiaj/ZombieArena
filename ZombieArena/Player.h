@@ -55,15 +55,11 @@ public:
 	uint collisions(ZombieManager* apZombies);
 
 	bool shoot(float xTarget, float yTarget);
+	void upgradeSpeed(); // Give player a speed boost
+	void upgradeHealth(); // Give the player some health
+	void increaseHealthLevel(int amount); // Increase the maximum amount of health the player can have
 
-	// Give player a speed boost
-	void upgradeSpeed();
-
-	// Give the player some health
-	void upgradeHealth();
-
-	// Increase the maximum amount of health the player can have
-	void increaseHealthLevel(int amount);
+	void setWeapon(WeaponType aWeapon);
 
 	Weapon m_weapon;
 
@@ -74,7 +70,8 @@ private:
 	Vector2f m_Position;
 
 	// Of course we will need a sprite
-	Sprite m_Sprite;
+	Sprite m_handgun;
+	Sprite m_shotgun;
 
 	// And a texture
 	// !!Watch this space!!

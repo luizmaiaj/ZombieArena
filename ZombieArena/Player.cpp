@@ -12,17 +12,10 @@ Player::Player()
 	m_MaxHealth = START_HEALTH;
 
 	// Associate a texture with the sprite
-	m_Sprite = Sprite(TextureHolder::GetTexture("graphics/player.png"));
+	m_handgun = Sprite(TextureHolder::GetTexture("graphics/player_handgun.png"));
+	m_shotgun = Sprite(TextureHolder::GetTexture("graphics/player_shotgun.png"));
 
-	// Set the origin of the sprite to the centre for smooth rotation
-	float fWidth_2 = m_Sprite.getLocalBounds().width / 2;
-	float fHeight_2 = m_Sprite.getLocalBounds().height / 2;
-	m_Sprite.setOrigin(fWidth_2, fHeight_2);
-
-	m_gapSize = (fWidth_2 > fHeight_2) ? fWidth_2 : fHeight_2;
-
-	// Remember how big the tiles are in this arena
-	m_gapSize = TILE_SIZE + m_gapSize;
+	setWeapon(WeaponType::HANDGUN);
 }
 
 void Player::resetPlayerStats()
@@ -78,7 +71,7 @@ bool Player::hit(Time timeHit)
 
 FloatRect Player::getPosition()
 {
-	return m_Sprite.getGlobalBounds();
+	return m_handgun.getGlobalBounds();
 }
 
 Vector2f Player::getCenter()
@@ -88,12 +81,20 @@ Vector2f Player::getCenter()
 
 float Player::getRotation()
 {
-	return m_Sprite.getRotation();
+	return m_handgun.getRotation();
 }
 
 Sprite Player::getSprite()
 {
-	return m_Sprite;
+	switch (m_weapon.getType())
+	{
+	case WeaponType::HANDGUN:
+		return m_handgun;
+	case WeaponType::SHOTGUN:
+		return m_shotgun;
+	}
+
+	return m_handgun;
 }
 
 int Player::getHealth()
@@ -174,26 +175,45 @@ bool Player::shoot(float xTarget, float yTarget)
 
 void Player::upgradeSpeed()
 {
-	// 20% speed upgrade
-	m_Speed += (float) (START_SPEED * .2);
+	m_Speed += (float) (START_SPEED * .2); // 20% speed upgrade
 }
 
 void Player::upgradeHealth()
 {
-	// 20% max health upgrade
-	m_MaxHealth += (int) (START_HEALTH * .2);
-
+	m_MaxHealth += (int) (START_HEALTH * .2); // 20% max health upgrade
 }
 
 void Player::increaseHealthLevel(int amount)
 {
 	m_Health += amount;
 
-	// But not beyond the maximum
-	if (m_Health > m_MaxHealth)
+	if (m_Health > m_MaxHealth) m_Health = m_MaxHealth;
+}
+
+void Player::setWeapon(WeaponType aWeapon)
+{
+	m_weapon.setType(aWeapon);
+
+	float fWidth_2 = 0.f;
+	float fHeight_2 = 0.f;
+
+	switch(aWeapon)
 	{
-		m_Health = m_MaxHealth;
+	case WeaponType::HANDGUN:
+		fWidth_2 = m_handgun.getLocalBounds().width / 2;
+		fHeight_2 = m_handgun.getLocalBounds().height / 2;
+		m_handgun.setOrigin(fWidth_2, fHeight_2);
+		break;
+	case WeaponType::SHOTGUN:
+		fWidth_2 = m_shotgun.getLocalBounds().width / 2;
+		fHeight_2 = m_shotgun.getLocalBounds().height / 2;
+		m_shotgun.setOrigin(fWidth_2, fHeight_2);
+		break;
 	}
+
+	m_gapSize = (fWidth_2 > fHeight_2) ? fWidth_2 : fHeight_2;
+
+	m_gapSize = TILE_SIZE + m_gapSize;
 }
 
 void Player::updatePosition(float aDT, Vector2i mousePosition)
@@ -210,10 +230,12 @@ void Player::updatePosition(float aDT, Vector2i mousePosition)
 	if (m_Position.y > m_playerArena.height) m_Position.y = (float) m_playerArena.height;
 	if (m_Position.y < m_playerArena.top) m_Position.y = (float) m_playerArena.top;
 
-	m_Sprite.setPosition(m_Position);
+	m_handgun.setPosition(m_Position);
+	m_shotgun.setPosition(m_Position);
 
 	// Calculate the angle the player is facing
 	float angle = atan2(mousePosition.y - m_res_2.y, mousePosition.x - m_res_2.x) * M_180_PI;
 
-	m_Sprite.setRotation(angle);
+	m_handgun.setRotation(angle);
+	m_shotgun.setRotation(angle);
 }

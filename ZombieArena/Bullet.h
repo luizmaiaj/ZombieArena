@@ -3,6 +3,9 @@
 
 using namespace sf;
 
+const float BULLET_SPEED = 1500.f;
+const float BULLET_RANGE = 1000.f;
+
 class Bullet
 {
 private:
@@ -16,7 +19,7 @@ private:
 	bool m_InFlight = false;
 
 	// How fast does a bullet travel?
-	float m_BulletSpeed = 1000;
+	float m_BulletSpeed = BULLET_SPEED;
 
 	// What fraction of 1 pixel does the bullet travel, 
 	// Horizontally and vertically each frame?
@@ -34,27 +37,13 @@ private:
 	float m_MaxY{ 0.f };
 	float m_MinY{ 0.f };
 
-	// Public function prototypes go here
 public:
-	// The constructor
-	Bullet();
-
-	// Stop the bullet
-	void stop();
-
-	// Returns the value of m_InFlight
-	bool isInFlight();
-
-	// Launch a new bullet
-	void shoot(float startX, float startY, float xTarget, float yTarget);
-
-	// Tell the calling code where the bullet is in the world
-	FloatRect getPosition();
-
-	// Return the actual shape (for drawing)
-	RectangleShape getShape();
-
-	// Update the bullet each frame
-	void update(float elapsedTime);
-
+	Bullet(); // The constructor
+	void stop(); // Stop the bullet
+	bool isInFlight(); // Returns the value of m_InFlight
+	void shoot(float startX, float startY, float xTarget, float yTarget, float aDeviation); // Launch a new bullet
+	FloatRect getPosition(); // Tell the calling code where the bullet is in the world
+	RectangleShape getShape(); // Return the actual shape (for drawing)
+	void update(float elapsedTime); // Update the bullet each frame
+	void setSpeed(float aSpeed);
 };

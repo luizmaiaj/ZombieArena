@@ -228,6 +228,14 @@ int main()
 						state = State::PAUSED;
 						footsteps.stop();
 					}
+					else if (event.key.code == Keyboard::Num1)
+					{
+						player.setWeapon(WeaponType::HANDGUN);
+					}
+					else if (event.key.code == Keyboard::Num2)
+					{
+						player.setWeapon(WeaponType::SHOTGUN);
+					}
 					else // move player with keyboard
 					{
 						player.move(event.key.code, (event.type == Event::KeyPressed)?true:false);

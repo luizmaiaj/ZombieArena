@@ -1,4 +1,7 @@
 #include "Bullet.h"
+const float M_PI = (float)3.14159265358979323846f;
+const float M_PI_180 = M_PI / 180.f;
+const float M_180_PI = 180.f / M_PI;
 
 // The constructor
 Bullet::Bullet()
@@ -6,52 +9,37 @@ Bullet::Bullet()
 	m_BulletShape.setSize(sf::Vector2f(2, 2));
 }
 
-void Bullet::shoot(float startX, float startY,
-	float targetX, float targetY)
+void Bullet::shoot(float startX, float startY, float targetX, float targetY, float aDeviation)
 {
-	// Keep track of the bullet
 	m_InFlight = true;
 	m_Position.x = startX;
 	m_Position.y = startY;
 
-	// Calculate the gradient of the flight path
-	float gradient = (startX - targetX) / (startY - targetY);
+	float dx = startX - targetX;
+	float dy = startY - targetY;
 
-	// Any gradient less than zero needs to be negative
-	if (gradient < 0)
-	{
-		gradient *= -1;
+	float angle = atan2(dy, dx) * M_180_PI;
+	
+	if (aDeviation != 0)
+	{ // correct the angles to deviate the bullet
+		angle += aDeviation;
+		dx = cos(angle * M_PI_180);
+		dy = sin(angle * M_PI_180);
 	}
-
-	// Calculate the ratio between x and t
-	float ratioXY = m_BulletSpeed / (1 + gradient);
 
 	// Set the "speed" horizontally and vertically
-	m_BulletDistanceY = ratioXY;
-	m_BulletDistanceX = ratioXY * gradient;
+	m_BulletDistanceY = m_BulletSpeed / (1 + abs(dx / dy));
+	m_BulletDistanceX = BULLET_SPEED - m_BulletDistanceY;
 
 	// Point the bullet in the right direction
-	if (targetX < startX)
-	{
-		m_BulletDistanceX *= -1;
-	}
-
-	if (targetY < startY)
-	{
-		m_BulletDistanceY *= -1;
-	}
-
-	// Finally, assign the results to the
-	// member variables
-	//m_XTarget = targetX;
-	//m_YTarget = targetY;
+	if (targetX < startX) m_BulletDistanceX = -m_BulletDistanceX;
+	if (targetY < startY) m_BulletDistanceY = -m_BulletDistanceY;
 
 	// Set a max range of 1000 pixels
-	float range = 1000;
-	m_MinX = startX - range;
-	m_MaxX = startX + range;
-	m_MinY = startY - range;
-	m_MaxY = startY + range;
+	m_MinX = startX - BULLET_RANGE;
+	m_MaxX = startX + BULLET_RANGE;
+	m_MinY = startY - BULLET_RANGE;
+	m_MaxY = startY + BULLET_RANGE;
 
 	// Position the bullet ready to be drawn
 	m_BulletShape.setPosition(m_Position);
@@ -88,10 +76,11 @@ void Bullet::update(float elapsedTime)
 	m_BulletShape.setPosition(m_Position);
 
 	// Has the bullet gone out of range?
-	if (m_Position.x < m_MinX || m_Position.x > m_MaxX ||
-		m_Position.y < m_MinY || m_Position.y > m_MaxY)
-	{
+	if (m_Position.x < m_MinX || m_Position.x > m_MaxX || m_Position.y < m_MinY || m_Position.y > m_MaxY)
 		m_InFlight = false;
-	}
+}
 
+void Bullet::setSpeed(float aSpeed)
+{
+	m_BulletSpeed = aSpeed;
 }
