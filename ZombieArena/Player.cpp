@@ -1,7 +1,3 @@
-#define _USE_MATH_DEFINES
-#include <cmath>
-const float M_180_PI = 180.f / (float)M_PI; 
-
 #include "Player.h"
 #include "TextureHolder.h"
 
@@ -170,7 +166,26 @@ uint Player::collisions(ZombieManager* apZombies)
 
 bool Player::shoot(float xTarget, float yTarget)
 {
-	return m_weapon.Shoot(getCenter().x, getCenter().y, xTarget, yTarget);
+	float xWeapon{ getCenter().x };
+	float yWeapon{ getCenter().y };
+	float rotation{ m_handgun.getRotation() };
+	float correction{ 0.f };
+
+	switch (m_weapon.getType())
+	{
+	case WeaponType::HANDGUN:
+		correction = (rotation + PLAYER_ARM_ANGLE_HG) * M_PI_180;
+		xWeapon += cos(correction) * PLAYER_ARM_DIST_HG;
+		yWeapon += sin(correction) * PLAYER_ARM_DIST_HG;
+		break;
+	case WeaponType::SHOTGUN:
+		correction = (rotation + PLAYER_ARM_ANGLE_SG) * M_PI_180;
+		xWeapon += cos(correction) * PLAYER_ARM_DIST_SG;
+		yWeapon += sin(correction) * PLAYER_ARM_DIST_SG;
+		break;
+	}
+
+	return m_weapon.Shoot(xWeapon, yWeapon, xTarget, yTarget);
 }
 
 void Player::upgradeSpeed()
@@ -203,10 +218,10 @@ void Player::setWeapon(WeaponType aWeapon)
 	switch(aWeapon)
 	{
 	case WeaponType::HANDGUN:
-		m_handgun.setOrigin(21.f, 27.f); // position determined by the size of the sprite
+		m_handgun.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN); // position determined by the size of the sprite
 		break;
 	case WeaponType::SHOTGUN:
-		m_shotgun.setOrigin(21.f, 27.f);  // position determined by the size of the sprite
+		m_shotgun.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN);  // position determined by the size of the sprite
 		break;
 	}
 

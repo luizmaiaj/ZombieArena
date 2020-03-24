@@ -22,8 +22,6 @@ private:
 	float m_BulletSpeed = BULLET_SPEED;
 
 	// What fraction of 1 pixel does the bullet travel, 
-	// Horizontally and vertically each frame?
-	// These values will be derived from m_BulletSpeed
 	float m_BulletDistanceX{ 0.f };
 	float m_BulletDistanceY{ 0.f };
 

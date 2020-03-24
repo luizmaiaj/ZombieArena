@@ -1,5 +1,9 @@
 #include "Weapon.h"
 
+const float M_PI = (float)3.14159265358979323846f;
+const float M_PI_180 = M_PI / 180.f;
+const float M_180_PI = 180.f / M_PI;
+
 Weapon::Weapon()
 {
 	Reset();
