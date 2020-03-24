@@ -194,20 +194,19 @@ void Player::setWeapon(WeaponType aWeapon)
 {
 	m_weapon.setType(aWeapon);
 
-	float fWidth_2 = 0.f;
-	float fHeight_2 = 0.f;
+	float fWidth_2 = m_handgun.getLocalBounds().width / 2;
+	float fHeight_2 = m_handgun.getLocalBounds().height / 2;
+
+	if (fWidth_2 < m_shotgun.getLocalBounds().width / 2) fWidth_2 = m_shotgun.getLocalBounds().width / 2;
+	if (fHeight_2 < m_shotgun.getLocalBounds().height / 2) fHeight_2 = m_shotgun.getLocalBounds().height / 2;
 
 	switch(aWeapon)
 	{
 	case WeaponType::HANDGUN:
-		fWidth_2 = m_handgun.getLocalBounds().width / 2;
-		fHeight_2 = m_handgun.getLocalBounds().height / 2;
-		m_handgun.setOrigin(fWidth_2, fHeight_2);
+		m_handgun.setOrigin(21.f, 27.f); // position determined by the size of the sprite
 		break;
 	case WeaponType::SHOTGUN:
-		fWidth_2 = m_shotgun.getLocalBounds().width / 2;
-		fHeight_2 = m_shotgun.getLocalBounds().height / 2;
-		m_shotgun.setOrigin(fWidth_2, fHeight_2);
+		m_shotgun.setOrigin(21.f, 27.f);  // position determined by the size of the sprite
 		break;
 	}
 
