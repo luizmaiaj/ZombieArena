@@ -56,6 +56,7 @@ private:
 	// Of course we will need a sprite
 	Sprite m_handgun;
 	Sprite m_shotgun;
+	Sprite m_rifle;
 
 	// What is the screen resolution
 	Vector2f m_res_2;

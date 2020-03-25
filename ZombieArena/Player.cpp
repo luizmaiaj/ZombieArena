@@ -9,7 +9,13 @@ Player::Player()
 
 	// Associate a texture with the sprite
 	m_handgun = Sprite(TextureHolder::GetTexture("graphics/player_handgun.png"));
+	m_handgun.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN);
+
 	m_shotgun = Sprite(TextureHolder::GetTexture("graphics/player_shotgun.png"));
+	m_shotgun.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN);
+
+	m_rifle   = Sprite(TextureHolder::GetTexture("graphics/player_rifle.png"));
+	m_rifle.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN);
 
 	setWeapon(WeaponType::HANDGUN);
 }
@@ -67,6 +73,19 @@ bool Player::hit(Time timeHit)
 
 FloatRect Player::getPosition()
 {
+	switch (m_weapon.getType())
+	{
+	case WeaponType::HANDGUN:
+		return m_handgun.getGlobalBounds();
+		break;
+	case WeaponType::SHOTGUN:
+		return m_shotgun.getGlobalBounds();
+		break;
+	case WeaponType::RIFLE:
+		return m_rifle.getGlobalBounds();
+		break;
+	}
+
 	return m_handgun.getGlobalBounds();
 }
 
@@ -88,6 +107,8 @@ Sprite Player::getSprite()
 		return m_handgun;
 	case WeaponType::SHOTGUN:
 		return m_shotgun;
+	case WeaponType::RIFLE:
+		return m_rifle;
 	}
 
 	return m_handgun;
@@ -168,7 +189,7 @@ bool Player::shoot(float xTarget, float yTarget)
 {
 	float xWeapon{ getCenter().x };
 	float yWeapon{ getCenter().y };
-	float rotation{ m_handgun.getRotation() };
+	float rotation{ getRotation() };
 	float correction{ 0.f };
 
 	switch (m_weapon.getType())
@@ -179,6 +200,7 @@ bool Player::shoot(float xTarget, float yTarget)
 		yWeapon += sin(correction) * PLAYER_ARM_DIST_HG;
 		break;
 	case WeaponType::SHOTGUN:
+	case WeaponType::RIFLE:
 		correction = (rotation + PLAYER_ARM_ANGLE_SG) * M_PI_180;
 		xWeapon += cos(correction) * PLAYER_ARM_DIST_SG;
 		yWeapon += sin(correction) * PLAYER_ARM_DIST_SG;
@@ -209,23 +231,18 @@ void Player::setWeapon(WeaponType aWeapon)
 {
 	m_weapon.setType(aWeapon);
 
-	float fWidth_2 = m_handgun.getLocalBounds().width / 2;
-	float fHeight_2 = m_handgun.getLocalBounds().height / 2;
-
-	if (fWidth_2 < m_shotgun.getLocalBounds().width / 2) fWidth_2 = m_shotgun.getLocalBounds().width / 2;
-	if (fHeight_2 < m_shotgun.getLocalBounds().height / 2) fHeight_2 = m_shotgun.getLocalBounds().height / 2;
-
-	switch(aWeapon)
+	switch (aWeapon)
 	{
 	case WeaponType::HANDGUN:
-		m_handgun.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN); // position determined by the size of the sprite
+		m_gapSize = m_handgun.getLocalBounds().width / 2;
 		break;
 	case WeaponType::SHOTGUN:
-		m_shotgun.setOrigin(PLAYER_X_ORIGIN, PLAYER_Y_ORIGIN);  // position determined by the size of the sprite
+		m_gapSize = m_shotgun.getLocalBounds().width / 2;
+		break;
+	case WeaponType::RIFLE:
+		m_gapSize = m_rifle.getLocalBounds().width / 2;
 		break;
 	}
-
-	m_gapSize = (fWidth_2 > fHeight_2) ? fWidth_2 : fHeight_2;
 
 	m_gapSize = TILE_SIZE + m_gapSize;
 }
@@ -246,10 +263,12 @@ void Player::updatePosition(float aDT, Vector2i mousePosition)
 
 	m_handgun.setPosition(m_Position);
 	m_shotgun.setPosition(m_Position);
+	m_rifle.setPosition(m_Position);
 
 	// Calculate the angle the player is facing
 	float angle = atan2(mousePosition.y - m_res_2.y, mousePosition.x - m_res_2.x) * M_180_PI;
 
 	m_handgun.setRotation(angle);
 	m_shotgun.setRotation(angle);
+	m_rifle.setRotation(angle);
 }

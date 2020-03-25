@@ -4,7 +4,7 @@
 using namespace sf;
 
 const float BULLET_SPEED = 1500.f;
-const float BULLET_RANGE = 1000.f;
+const float BULLET_RANGE = 500.f;
 
 class Bullet
 {
@@ -16,14 +16,15 @@ private:
 	RectangleShape m_BulletShape;
 
 	// Is this bullet currently whizzing through the air
-	bool m_InFlight = false;
+	bool m_inFlight = false;
 
 	// How fast does a bullet travel?
-	float m_BulletSpeed = BULLET_SPEED;
+	float m_bulletSpeed{ BULLET_SPEED };
+	float m_bulletRange{ BULLET_RANGE };
 
 	// What fraction of 1 pixel does the bullet travel, 
-	float m_BulletDistanceX{ 0.f };
-	float m_BulletDistanceY{ 0.f };
+	float m_bulletDistanceX{ 0.f };
+	float m_bulletDistanceY{ 0.f };
 
 	// Where is this bullet headed to?
 	float m_XTarget{ 0.f };
@@ -44,4 +45,5 @@ public:
 	RectangleShape getShape(); // Return the actual shape (for drawing)
 	void update(float elapsedTime); // Update the bullet each frame
 	void setSpeed(float aSpeed);
+	void setRange(float aRange);
 };

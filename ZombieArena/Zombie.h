@@ -39,7 +39,7 @@ private:
 public:
 
 	// Handle when a bullet hits a zombie
-	bool hit();
+	bool hit(float aDamage);
 
 	// Find out if the zombie is alive
 	bool isAlive();

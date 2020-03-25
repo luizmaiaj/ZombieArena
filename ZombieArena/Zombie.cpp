@@ -53,9 +53,9 @@ void Zombie::spawn(float startX, float startY, int type, int seed)
 	m_Sprite.setPosition(m_Position);
 }
 
-bool Zombie::hit()
+bool Zombie::hit(float aDamage)
 {
-	m_Health--;
+	m_Health -= aDamage;
 
 	if (m_Health <= 0)
 	{

@@ -11,6 +11,7 @@ constexpr uint START_BULLETS = 24;
 constexpr uint BULLET_SPRITES = 100;
 constexpr uint FIRE_RATE = 1000;
 constexpr uint RELOAD_RATE = 1000;
+constexpr float DAMAGE = 1.f;
 
 enum class WeaponType { HANDGUN, SHOTGUN, RIFLE, KNIFE };
 
@@ -42,6 +43,7 @@ private:
 	uint m_fireRate{ FIRE_RATE };
 	LSound* m_shotgun{ NULL };
 	LSound* m_handgun{ NULL };
+	LSound* m_rifle{ NULL };
 	LSound* m_reload{ NULL };
 	LSound* m_reloadFailed{ NULL };
 	LSound* m_splat{ NULL };
@@ -52,5 +54,6 @@ private:
 	Bullet m_bullets[BULLET_SPRITES];
 	int m_currentBullet{ 0 };
 	WeaponType m_weaponType{ WeaponType::HANDGUN };
+	float m_damage{ DAMAGE };
 };
 

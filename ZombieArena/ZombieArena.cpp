@@ -236,6 +236,10 @@ int main()
 					{
 						player.setWeapon(WeaponType::SHOTGUN);
 					}
+					else if (event.key.code == Keyboard::Num3)
+					{
+						player.setWeapon(WeaponType::RIFLE);
+					}
 					else // move player with keyboard
 					{
 						player.move(event.key.code, (event.type == Event::KeyPressed)?true:false);
